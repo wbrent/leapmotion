@@ -13,8 +13,6 @@ class Dispatcher : public Leap::Listener
 
 public:
 
-    bool isConnected;
-
     Leap::Frame frame;
 
     void onInit (const Leap::Controller&);

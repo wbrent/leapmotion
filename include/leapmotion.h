@@ -30,8 +30,7 @@ typedef struct _leapmotion
     t_symbol* x_objSymbol;
     LeapMotionObj* x_leapMotionObjPtr;
 
-    t_float x_generalFlag;
-
+    t_float x_handsTypeFlag;
     t_float x_handsSphereRadiusFlag;
     t_float x_handsSphereCenterFlag;
     t_float x_handsDirectionFlag;
@@ -51,6 +50,8 @@ typedef struct _leapmotion
     t_float x_toolsVelocityFlag;
     t_float x_toolsSizeFlag;
 
+    t_float x_generalFlag;
+
     t_outlet* x_outletGeneral;
     t_outlet* x_outletHandsFingersTools;
     t_outlet* x_outletGesture;
@@ -68,6 +69,7 @@ extern "C" {void leapmotion_setup (void);}
 static void leapmotionSetGeneralFlag (t_leapmotion* x, t_float state);
 
 // set methods: hands
+static void leapmotionSetHandsTypeFlag (t_leapmotion* x, t_float state);
 static void leapmotionSetHandsSphereRadiusFlag (t_leapmotion* x, t_float state);
 static void leapmotionSetHandsSphereCenterFlag (t_leapmotion* x, t_float state);
 static void leapmotionSetHandsDirectionFlag (t_leapmotion* x, t_float state);
@@ -97,3 +99,10 @@ static void leapmotionInfo (t_leapmotion* x);
 
 // poll LEAP device
 static void leapmotionPoll (t_leapmotion* x);
+
+// sub-routinese to extract data from a Leap::Frame
+static void leapmotionProcessGestures(t_leapmotion* x, Leap::Frame frame);
+static void leapmotionProcessHands(t_leapmotion* x, Leap::Frame frame);
+static void leapmotionProcessFingers(t_leapmotion* x, Leap::Frame frame, int handIdx, Leap::FingerList fingerList);
+static void leapmotionProcessTools(t_leapmotion* x, Leap::Frame frame);
+static void leapmotionProcessGeneral(t_leapmotion* x, Leap::Frame frame);
