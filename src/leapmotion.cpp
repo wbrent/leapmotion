@@ -496,7 +496,10 @@ static void leapmotionPoll (t_leapmotion* x)
     frame = dispatcher.frame;
 
     numHandsPerFrame = frame.hands().count();
+    // from LeapSDK/docs/cpp/devguide/Leap_Pointables.html: "As of version 2.0 of the Leap Motion SDK, all five fingers are are always present in the list of fingers for a hand."
+    // therefore, Leap::FingerList.count() will not work as it did in the previous SDK. can use Leap::Finger.isExtended() to determine which ones are actually out.
     numFingersPerFrame = frame.fingers().count();
+    // TODO: perhaps remove the general frame finger count entirely? it doesn't really provide any new information since each hand will always have a finger count of 5. can use the hand finger count to actually check whether each finger in the list isExtended().
     numToolsPerFrame = frame.tools().count();
     numGesturesPerFrame = frame.gestures().count();
 
@@ -585,6 +588,8 @@ static void leapmotionPoll (t_leapmotion* x)
         int numFingersPerHand, numToolsPerHand;
 
         hand = frame.hands()[handIdx];
+        // from LeapSDK/docs/cpp/devguide/Leap_Pointables.html: "As of version 2.0 of the Leap Motion SDK, all five fingers are are always present in the list of fingers for a hand."
+        // therefore, Leap::FingerList.count() will not work as it did in the previous SDK. can use Leap::Finger.isExtended() to determine which ones are actually out.
         numFingersPerHand = hand.fingers().count();
         numToolsPerHand = hand.tools().count();
 
@@ -663,9 +668,19 @@ static void leapmotionPoll (t_leapmotion* x)
         // finger count
         if (x->x_handsFingerCountFlag)
         {
+            int fingerCount = 0;
+
+            for (int fingerIdx = 0; fingerIdx < numFingersPerHand; fingerIdx++)
+            {
+                Leap::Finger finger;
+                finger = hand.fingers()[fingerIdx];
+
+                fingerCount += finger.isExtended();
+            }
+
             SETFLOAT (&handInfo[0], handIdx);
             SETSYMBOL (&handInfo[1], gensym ("finger_count"));
-            SETFLOAT (&handInfo[2], numFingersPerHand);
+            SETFLOAT (&handInfo[2], fingerCount);
 
             outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), 3, handInfo);
         }
@@ -692,7 +707,8 @@ static void leapmotionPoll (t_leapmotion* x)
             {
                 SETFLOAT (&fingerInfo[0], handIdx);
                 SETSYMBOL (&fingerInfo[1], gensym ("fingers"));
-                SETFLOAT (&fingerInfo[2], fingerIdx);
+                // use Leap::Finger.type() to get stable finger indices where 0 is the thumb, and 4 is the pinky
+                SETFLOAT (&fingerInfo[2], finger.type());
                 SETSYMBOL (&fingerInfo[3], gensym ("direction"));
                 SETFLOAT (&fingerInfo[4], finger.direction().x);
                 SETFLOAT (&fingerInfo[5], finger.direction().y);

@@ -21,6 +21,7 @@ void Dispatcher::onDisconnect (const Leap::Controller& controller)
 void Dispatcher::onExit (const Leap::Controller& controller)
 {
     post ("LEAP device: Exited");
+    isConnected = false;
 }
 
 void Dispatcher::onFrame (const Leap::Controller& controller)
