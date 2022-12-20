@@ -5,13 +5,33 @@
 
 lib.name = leapmotion
 
-# specify the location and name of the LEAP library
-# this project is built against LeapDeveloperKit_2.3.1+31549_mac, and requires the same version of libLeap.dylib
-ldlibs = -L/your/path/to/LeapDeveloperKit_2.3.1+31549_mac/LeapSDK/lib -lLeap
+# this project is built against Leap Developer Kit 2.3.1+31549, and requires the same version of Leap.so (Linux) libLeap.dylib (macOS), or Leap.dll (Windows)
+# specify the location of the 2.3.1 LeapSDK directory
+leapSDKdir = /your/path/to/the/LeapSDK
 
-# specify include directory with the LEAP headers
-# NOTE: received the following warning on first compile attempt: "clang: warning: include path for libstdc++ headers not found; pass '-stdlib=libc++' on the command line to use the libc++ standard library instead [-Wstdlibcxx-not-found]". so, should set -stdlib accordingly via pd-lib-builder's cflags. had to set the minimum macOS version to 10.9 in order to work with libc++ standard library.
-cflags = -Iinclude -I/your/path/to/LeapDeveloperKit_2.3.1+31549_mac/LeapSDK/include -mmacosx-version-min=10.9 -stdlib=libc++
+define forLinux
+  # specify the location and name of the LEAP library
+  ldlibs = -L$(leapSDKdir)/lib/x64 -lLeap
+
+  # specify include directory with the LEAP headers
+  cflags = -Iinclude -I$(leapSDKdir)/include
+endef
+
+define forDarwin
+  # specify the location and name of the LEAP library
+  ldlibs = -L$(leapSDKdir)/lib -lLeap
+
+  # specify include directory with the LEAP headers
+  cflags = -Iinclude -I$(leapSDKdir)/include -mmacosx-version-min=10.9 -stdlib=libc++
+endef
+
+define forLinux
+  # specify the location and name of the LEAP library
+  ldlibs = -L$(leapSDKdir)/lib/x64 -lLeap
+
+  # specify include directory with the LEAP headers
+  cflags = -Iinclude -I$(leapSDKdir)/include
+endef
 
 $(lib.name).class.sources = src/$(lib.name).cpp
 
