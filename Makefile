@@ -5,7 +5,7 @@
 
 lib.name = leapmotion
 
-# this project is built against Leap Developer Kit 2.3.1+31549, and requires the same version of Leap.so (Linux) libLeap.dylib (macOS), or Leap.dll (Windows)
+# this project is built against Leap Developer Kit 2.3.1+31549, and requires the same version of libLeap.so (Linux) libLeap.dylib (macOS), or Leap.dll (Windows)
 # specify the location of the 2.3.1 LeapSDK directory
 leapSDKdir = /your/path/to/the/LeapSDK
 
