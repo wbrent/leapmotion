@@ -15,10 +15,10 @@ public:
 
     Leap::Frame frame;
 
-    void onInit (const Leap::Controller&);
-    void onConnect (const Leap::Controller&);
-    void onDisconnect (const Leap::Controller&);
-    void onExit (const Leap::Controller&);
-    void onFrame (const Leap::Controller&);
+    virtual void onInit (const Leap::Controller&);
+    virtual void onConnect (const Leap::Controller&);
+    virtual void onDisconnect (const Leap::Controller&);
+    virtual void onExit (const Leap::Controller&);
+    virtual void onFrame (const Leap::Controller&);
 
 };
