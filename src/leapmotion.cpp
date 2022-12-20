@@ -499,7 +499,7 @@ static void leapmotionPoll (t_leapmotion* x)
 {
     Leap::Frame frame;
 
-    if (! x->x_leapMotionObjPtr->m_controller.isServiceConnected())
+    if (! x->x_leapMotionObjPtr->m_controller.isConnected())
     {
         pd_error(x, "[%s]: No Leap Motion Controller connected!", x->x_objSymbol->s_name);
         return;
