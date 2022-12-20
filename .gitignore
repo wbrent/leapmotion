@@ -8,7 +8,9 @@ help/.DS_Store
 help/leapmotion.dll
 help/leapmotion.pd_darwin
 help/leapmotion.pd_linux
+help/libLeap.so
 help/libLeap.dylib
+help/Leap.dll
 help/lib/.DS_Store
 
 pd-lib-builder/.DS_Store
