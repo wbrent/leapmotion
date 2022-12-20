@@ -25,7 +25,7 @@ define forDarwin
   cflags = -Iinclude -I$(leapSDKdir)/include -mmacosx-version-min=10.9 -stdlib=libc++
 endef
 
-define forLinux
+define forWindows
   # specify the location and name of the LEAP library
   ldlibs = -L$(leapSDKdir)/lib/x64 -lLeap
 
