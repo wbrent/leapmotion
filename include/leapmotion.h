@@ -30,6 +30,8 @@ typedef struct _leapmotion
     t_symbol* x_objSymbol;
     LeapMotionObj* x_leapMotionObjPtr;
 
+    t_float x_gestureCountFlag;
+
     t_float x_handsTypeFlag;
     t_float x_handsSphereRadiusFlag;
     t_float x_handsSphereCenterFlag;
@@ -92,6 +94,7 @@ static void leapmotionSetToolsVelocityFlag (t_leapmotion* x, t_float state);
 static void leapmotionSetToolsSizeFlag (t_leapmotion* x, t_float state);
 
 // set methods: gestures
+static void leapmotionSetGestureCountFlag (t_leapmotion* x, t_float state);
 static void leapmotionSetGestureFlags (t_leapmotion* x, t_symbol* s, int argc, t_atom* argv);
 
 // post object info

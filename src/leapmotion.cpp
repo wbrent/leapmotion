@@ -14,6 +14,8 @@ static void* leapmotion_new (t_symbol* s, int argc, t_atom* argv)
     // create the LeapMotionObj instance and store a pointer to it
     x->x_leapMotionObjPtr = new LeapMotionObj;
 
+    x->x_gestureCountFlag = 0.0;
+
     x->x_handsTypeFlag = 0.0;
     x->x_handsSphereRadiusFlag = 0.0;
     x->x_handsSphereCenterFlag = 0.0;
@@ -83,7 +85,17 @@ void leapmotion_setup (void)
     );
 
 
-    // set meethods
+    // set methods
+    // gesture count
+    class_addmethod (
+        leapmotion_class,
+        (t_method) leapmotionSetGestureCountFlag,
+        gensym ("gesture_count"),
+        A_DEFFLOAT,
+        A_NULL
+    );
+
+
     // general
     class_addmethod (
         leapmotion_class,
@@ -398,6 +410,15 @@ static void leapmotionSetToolsSizeFlag (t_leapmotion* x, t_float state)
 
 
 // set methods: gestures
+// count
+static void leapmotionSetGestureCountFlag (t_leapmotion* x, t_float state)
+{
+    state = (state < 0.0) ? 0.0 : state;
+    state = (state > 1.0) ? 1.0 : state;
+
+    x->x_gestureCountFlag = state;
+}
+
 static void leapmotionSetGestureFlags (t_leapmotion* x, t_symbol* s, int argc, t_atom* argv)
 {
     if (argc > 2)
@@ -486,6 +507,7 @@ static void leapmotionInfo (t_leapmotion* x)
     post ("tools_velocity: %1.0f", x->x_toolsVelocityFlag);
     post ("tools_size: %1.0f\n", x->x_toolsSizeFlag);
 
+    post ("gesture_count: %1.0f", x->x_gestureCountFlag);
     // need to post state as an integer based on isGestureEnabled return type
     post ("gestures/TYPE_CIRCLE: %i", x->x_leapMotionObjPtr->m_controller.isGestureEnabled (Leap::Gesture::TYPE_CIRCLE));
     post ("gestures/TYPE_SWIPE: %i", x->x_leapMotionObjPtr->m_controller.isGestureEnabled (Leap::Gesture::TYPE_SWIPE));
@@ -532,12 +554,16 @@ static void leapmotionProcessGestures (t_leapmotion* x, Leap::Frame frame)
 {
     Leap::GestureList gestureList = frame.gestures();
     int numGesturesPerFrame = gestureList.count();
-    int numGestureCountAtoms = 2;
-    t_atom gestureCountInfo[numGestureCountAtoms];
 
-    SETSYMBOL (&gestureCountInfo[0], gensym ("count"));
-    SETFLOAT (&gestureCountInfo[1], (t_float) numGesturesPerFrame);
-    outlet_list(x->x_outletGesture, 0, numGestureCountAtoms, &gestureCountInfo[0]);
+    if (x->x_gestureCountFlag)
+    {
+        int numGestureCountAtoms = 2;
+        t_atom gestureCountInfo[numGestureCountAtoms];
+
+        SETSYMBOL (&gestureCountInfo[0], gensym ("count"));
+        SETFLOAT (&gestureCountInfo[1], (t_float) numGesturesPerFrame);
+        outlet_list(x->x_outletGesture, 0, numGestureCountAtoms, &gestureCountInfo[0]);
+    }
 
     for (int gestureIdx = 0; gestureIdx < numGesturesPerFrame; gestureIdx++)
     {
