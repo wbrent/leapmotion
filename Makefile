@@ -11,7 +11,8 @@ leapSDKdir = /your/path/to/the/LeapSDK
 
 define forLinux
   # specify the location and name of the LEAP library
-  ldlibs = -L$(leapSDKdir)/lib/x64 -lLeap
+  ldflags = -L$(leapSDKdir)/lib/x64
+	ldlibs = -lLeap
 
   # specify include directory with the LEAP headers
   cflags = -Iinclude -I$(leapSDKdir)/include
@@ -19,7 +20,8 @@ endef
 
 define forDarwin
   # specify the location and name of the LEAP library
-  ldlibs = -L$(leapSDKdir)/lib -lLeap
+	ldflags = -L$(leapSDKdir)/lib
+  ldlibs = -lLeap
 
   # specify include directory with the LEAP headers
   cflags = -Iinclude -I$(leapSDKdir)/include -mmacosx-version-min=10.9 -stdlib=libc++
@@ -27,7 +29,8 @@ endef
 
 define forWindows
   # specify the location and name of the LEAP library
-  ldlibs = -L$(leapSDKdir)/lib/x64 -lLeap
+  ldflags = -L$(leapSDKdir)/lib/x64
+	ldlibs = -lLeap
 
   # specify include directory with the LEAP headers
   cflags = -Iinclude -I$(leapSDKdir)/include
