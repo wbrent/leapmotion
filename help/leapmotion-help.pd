@@ -1,4 +1,4 @@
-#N canvas 402 139 479 632 10;
+#N canvas 402 139 517 632 10;
 #X declare -path ./lib;
 #X obj 39 379 metro 50;
 #X msg 59 409 info;
@@ -8,7 +8,7 @@
 #X obj 19 589 s general;
 #X obj 90 539 s tool;
 #X obj 39 359 tgl 16 0 empty empty empty 0 -8 0 10 #fcfcfc #000000 #000000 0 1;
-#X text 300 596 [leapmotion] version 0.2.0;
+#X text 328 599 [leapmotion] version 0.2.0;
 #N canvas 855 347 457 315 tool-data 0;
 #N canvas 698 164 615 451 tool 0;
 #X obj 299 63 r tool;
@@ -29,7 +29,7 @@
 #X coords 0 -1 1 1 380 250 1 100 100;
 #X restore 34 28 pd tool;
 #X restore 269 209 pd tool-data;
-#N canvas 844 558 450 234 gesture-data 0;
+#N canvas 844 558 450 365 gesture-data 0;
 #N canvas 836 333 450 300 gesture 0;
 #X obj 30 140 gesture 0;
 #X obj 160 140 gesture 1;
@@ -43,6 +43,10 @@
 #X connect 6 0 3 0;
 #X coords 0 -1 1 1 400 180 1 20 80;
 #X restore 23 29 pd gesture;
+#X text 87 229 for more information on gestures \, see:;
+#X obj 23 311 pdcontrol;
+#X msg 23 259 browse https://developer-archive.leapmotion.com/documentation/v2/cpp/devguide/Leap_Gestures.html;
+#X connect 3 0 2 0;
 #X restore 269 229 pd gesture-data;
 #N canvas 415 25 405 323 general-data 0;
 #X floatatom 169 122 10 0 0 0 frameID - - 0;
@@ -172,14 +176,21 @@
 #X connect 57 0 15 0;
 #X coords 0 -1 1 1 230 310 1 160 100;
 #X restore 19 29 pd flag-controls;
-#X text 376 211 open sub-patches to see data, f 12;
+#X text 376 211 open sub-patches to see data, f 16;
 #X text 62 359 start polling LEAP device;
 #X obj 11 441 cnv 16 106 32 empty empty empty 20 12 0 10 #e0e0e0 #404040 0;
 #X obj 19 449 leapmotion;
-#N canvas 702 63 1101 426 hand/finger-data 0;
+#N canvas 702 63 1101 524 hand/finger-data 0;
 #X obj 558 39 hand 1;
 #X obj 18 39 hand 0;
+#X obj 368 481 pdcontrol;
+#X text 432 399 for more information on hand data \, see:;
+#X msg 368 429 browse https://developer-archive.leapmotion.com/documentation/v2/cpp/api/Leap.Hand.html#cppclass_leap_1_1_hand_1a5f68dfe482e57463b249d8e8062e05a8;
+#X connect 4 0 2 0;
 #X restore 269 189 pd hand/finger-data;
+#X text 208 466 specific tracking data is output or suppressed based on the state of its corresponding flag. see inside [pd flag-controls] for details., f 46;
+#X text 208 516 output from the object is easily parsed using [route] objects \, as demonstrated in the sub-patches and abstractions above., f 46;
+#X text 208 396 [leapmotion] accesses tracking data from the original Leap Motion Controller using Leap SDK version 2.3.1 under Linux and macOS. this version is a fork of Chikashi Miyama's original Pd_leapmotion version 0.1 code., f 46;
 #X connect 0 0 16 0;
 #X connect 1 0 16 0;
 #X connect 2 0 4 0;
