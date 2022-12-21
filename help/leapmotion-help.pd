@@ -185,7 +185,7 @@
 #X obj 18 39 hand 0;
 #X obj 368 481 pdcontrol;
 #X text 432 399 for more information on hand data \, see:;
-#X msg 368 429 browse https://developer-archive.leapmotion.com/documentation/v2/cpp/api/Leap.Hand.html#cppclass_leap_1_1_hand_1a5f68dfe482e57463b249d8e8062e05a8;
+#X msg 368 429 browse https://developer-archive.leapmotion.com/documentation/v2/cpp/api/Leap.Hand.html;
 #X connect 4 0 2 0;
 #X restore 269 189 pd hand/finger-data;
 #X text 208 466 specific tracking data is output or suppressed based on the state of its corresponding flag. see inside [pd flag-controls] for details., f 46;
