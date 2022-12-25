@@ -1,24 +1,13 @@
 // this project is built against LeapDeveloperKit_2.3.1+31549_mac, and requires the same version of libLeap.dylib
 
-#ifndef PD_H
-#define PD_H
+#ifndef LEAPMOTION_H
+#define LEAPMOTION_H
+
 #include "m_pd.h"
-#endif
-
-#ifndef LEAP_H
-#define LEAP_H
 #include "Leap.h"
-#endif
 
-#ifndef DISPATCHER_H
-#define DISPATCHER_H
-#include "Dispatcher.h"
-#endif
-
-#ifndef LEAP_MOTION_OBJ_H
-#define LEAP_MOTION_OBJ_H
 #include "LeapMotionObj.h"
-#endif
+#include "Dispatcher.h"
 
 #define PDLEAPMOTION_VERSION "version 0.2.0"
 
@@ -109,3 +98,5 @@ static void leapmotionProcessHands(t_leapmotion* x, Leap::Frame frame);
 static void leapmotionProcessFingers(t_leapmotion* x, Leap::Frame frame, int handIdx, Leap::FingerList fingerList);
 static void leapmotionProcessTools(t_leapmotion* x, Leap::Frame frame);
 static void leapmotionProcessGeneral(t_leapmotion* x, Leap::Frame frame);
+
+#endif

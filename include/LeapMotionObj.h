@@ -1,12 +1,9 @@
-#ifndef LEAP_H
-#define LEAP_H
-#include "Leap.h"
-#endif
+#ifndef LEAP_MOTION_OBJ_H
+#define LEAP_MOTION_OBJ_H
 
-#ifndef DISPATCHER_H
-#define DISPATCHER_H
+#include "Leap.h"
+
 #include "Dispatcher.h"
-#endif
 
 class LeapMotionObj
 {
@@ -20,3 +17,5 @@ public:
     Leap::Controller m_controller;
 
 };
+
+#endif

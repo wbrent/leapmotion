@@ -1,12 +1,8 @@
-#ifndef PD_H
-#define PD_H
-#include "m_pd.h"
-#endif
+#ifndef DISPATCHER_H
+#define DISPATCHER_H
 
-#ifndef LEAP_H
-#define LEAP_H
+#include "m_pd.h"
 #include "Leap.h"
-#endif
 
 class Dispatcher : public Leap::Listener
 {
@@ -22,3 +18,5 @@ public:
     virtual void onFrame (const Leap::Controller&);
 
 };
+
+#endif
