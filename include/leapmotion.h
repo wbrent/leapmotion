@@ -1,4 +1,4 @@
-// this project is built against LeapDeveloperKit_2.3.1+31549_mac, and requires the same version of libLeap.dylib
+// this project is built against Leap SDK 2.3.1+31549, and should be linked with the same version of libLeap.so, libLeap.dylib, or leap.lib
 
 #ifndef LEAPMOTION_H
 #define LEAPMOTION_H
@@ -9,7 +9,7 @@
 #include "LeapMotionObj.h"
 #include "Dispatcher.h"
 
-#define PDLEAPMOTION_VERSION "version 0.2.0"
+#define PDLEAPMOTION_VERSION "version 0.2.1"
 
 static t_class* leapmotion_class;
 
@@ -19,29 +19,34 @@ typedef struct _leapmotion
     t_symbol* x_objSymbol;
     LeapMotionObj* x_leapMotionObjPtr;
 
-    t_float x_gestureCountFlag;
+    uint8_t x_gestureCountFlag;
 
-    t_float x_handsTypeFlag;
-    t_float x_handsSphereRadiusFlag;
-    t_float x_handsSphereCenterFlag;
-    t_float x_handsDirectionFlag;
-    t_float x_handsPalmNormalFlag;
-    t_float x_handsPalmPositionFlag;
-    t_float x_handsPalmVelocityFlag;
-    t_float x_handsFingerCountFlag;
-    t_float x_handsToolCountFlag;
+    uint8_t x_handsArmCenterFlag;
+    uint8_t x_handsArmDirectionFlag;
+    uint8_t x_handsArmElbowPositionFlag;
+    uint8_t x_handsArmWristPositionFlag;
+    uint8_t x_handsArmWidthFlag;
+    uint8_t x_handsTypeFlag;
+    uint8_t x_handsSphereRadiusFlag;
+    uint8_t x_handsSphereCenterFlag;
+    uint8_t x_handsDirectionFlag;
+    uint8_t x_handsPalmNormalFlag;
+    uint8_t x_handsPalmPositionFlag;
+    uint8_t x_handsPalmVelocityFlag;
+    uint8_t x_handsFingerCountFlag;
+    uint8_t x_handsToolCountFlag;
 
-    t_float x_fingersDirectionFlag;
-    t_float x_fingersPositionFlag;
-    t_float x_fingersVelocityFlag;
-    t_float x_fingersSizeFlag;
+    uint8_t x_fingersDirectionFlag;
+    uint8_t x_fingersPositionFlag;
+    uint8_t x_fingersVelocityFlag;
+    uint8_t x_fingersSizeFlag;
 
-    t_float x_toolsDirectionFlag;
-    t_float x_toolsPositionFlag;
-    t_float x_toolsVelocityFlag;
-    t_float x_toolsSizeFlag;
+    uint8_t x_toolsDirectionFlag;
+    uint8_t x_toolsPositionFlag;
+    uint8_t x_toolsVelocityFlag;
+    uint8_t x_toolsSizeFlag;
 
-    t_float x_generalFlag;
+    uint8_t x_generalFlag;
 
     t_outlet* x_outletGeneral;
     t_outlet* x_outletHandsFingersTools;
@@ -60,6 +65,11 @@ extern "C" {void leapmotion_setup (void);}
 static void leapmotionSetGeneralFlag (t_leapmotion* x, t_float state);
 
 // set methods: hands
+static void leapmotionSetHandsArmCenterFlag (t_leapmotion* x, t_float state);
+static void leapmotionSetHandsArmDirectionFlag (t_leapmotion* x, t_float state);
+static void leapmotionSetHandsArmElbowPositionFlag (t_leapmotion* x, t_float state);
+static void leapmotionSetHandsArmWristPositionFlag (t_leapmotion* x, t_float state);
+static void leapmotionSetHandsArmWidthFlag (t_leapmotion* x, t_float state);
 static void leapmotionSetHandsTypeFlag (t_leapmotion* x, t_float state);
 static void leapmotionSetHandsSphereRadiusFlag (t_leapmotion* x, t_float state);
 static void leapmotionSetHandsSphereCenterFlag (t_leapmotion* x, t_float state);
@@ -93,10 +103,11 @@ static void leapmotionInfo (t_leapmotion* x);
 static void leapmotionPoll (t_leapmotion* x);
 
 // sub-routinese to extract data from a Leap::Frame
-static void leapmotionProcessGestures(t_leapmotion* x, Leap::Frame frame);
-static void leapmotionProcessHands(t_leapmotion* x, Leap::Frame frame);
-static void leapmotionProcessFingers(t_leapmotion* x, Leap::Frame frame, int handIdx, Leap::FingerList fingerList);
-static void leapmotionProcessTools(t_leapmotion* x, Leap::Frame frame);
-static void leapmotionProcessGeneral(t_leapmotion* x, Leap::Frame frame);
+static void leapmotionProcessGestures (t_leapmotion* x, Leap::Frame frame);
+static void leapmotionProcessArm (t_leapmotion* x, int handIdx, Leap::Hand hand);
+static void leapmotionProcessHands (t_leapmotion* x, Leap::Frame frame);
+static void leapmotionProcessFingers (t_leapmotion* x, int handIdx, Leap::FingerList fingerList);
+static void leapmotionProcessTools (t_leapmotion* x, Leap::Frame frame);
+static void leapmotionProcessGeneral (t_leapmotion* x, Leap::Frame frame);
 
-#endif
+#endif // LEAPMOTION_H

@@ -14,29 +14,34 @@ static void* leapmotion_new (t_symbol* s, int argc, t_atom* argv)
     // create the LeapMotionObj instance and store a pointer to it
     x->x_leapMotionObjPtr = new LeapMotionObj;
 
-    x->x_gestureCountFlag = 0.0;
+    x->x_gestureCountFlag = 0;
 
-    x->x_handsTypeFlag = 0.0;
-    x->x_handsSphereRadiusFlag = 0.0;
-    x->x_handsSphereCenterFlag = 0.0;
-    x->x_handsDirectionFlag = 0.0;
-    x->x_handsPalmNormalFlag = 0.0;
-    x->x_handsPalmPositionFlag = 1.0;
-    x->x_handsPalmVelocityFlag = 0.0;
-    x->x_handsFingerCountFlag = 0.0;
-    x->x_handsToolCountFlag = 0.0;
+    x->x_handsArmCenterFlag = 0;
+    x->x_handsArmDirectionFlag = 0;
+    x->x_handsArmElbowPositionFlag = 0;
+    x->x_handsArmWristPositionFlag = 0;
+    x->x_handsArmWidthFlag = 0;
+    x->x_handsTypeFlag = 0;
+    x->x_handsSphereRadiusFlag = 0;
+    x->x_handsSphereCenterFlag = 0;
+    x->x_handsDirectionFlag = 0;
+    x->x_handsPalmNormalFlag = 0;
+    x->x_handsPalmPositionFlag = 1;
+    x->x_handsPalmVelocityFlag = 0;
+    x->x_handsFingerCountFlag = 0;
+    x->x_handsToolCountFlag = 0;
 
-    x->x_fingersDirectionFlag = 0.0;
-    x->x_fingersPositionFlag = 0.0;
-    x->x_fingersVelocityFlag = 0.0;
-    x->x_fingersSizeFlag = 0.0;
+    x->x_fingersDirectionFlag = 0;
+    x->x_fingersPositionFlag = 0;
+    x->x_fingersVelocityFlag = 0;
+    x->x_fingersSizeFlag = 0;
 
-    x->x_toolsDirectionFlag = 0.0;
-    x->x_toolsPositionFlag = 0.0;
-    x->x_toolsVelocityFlag = 0.0;
-    x->x_toolsSizeFlag = 0.0;
+    x->x_toolsDirectionFlag = 0;
+    x->x_toolsPositionFlag = 0;
+    x->x_toolsVelocityFlag = 0;
+    x->x_toolsSizeFlag = 0;
 
-    x->x_generalFlag = 1.0;
+    x->x_generalFlag = 1;
 
     post ("\n****************");
     post ("[leapmotion] for Pd %s", PDLEAPMOTION_VERSION);
@@ -107,6 +112,46 @@ void leapmotion_setup (void)
 
 
     // hands
+    class_addmethod (
+        leapmotion_class,
+        (t_method) leapmotionSetHandsArmCenterFlag,
+        gensym ("arms_center"),
+        A_DEFFLOAT,
+        A_NULL
+    );
+
+    class_addmethod (
+        leapmotion_class,
+        (t_method) leapmotionSetHandsArmDirectionFlag,
+        gensym ("arms_direction"),
+        A_DEFFLOAT,
+        A_NULL
+    );
+
+    class_addmethod (
+        leapmotion_class,
+        (t_method) leapmotionSetHandsArmElbowPositionFlag,
+        gensym ("arms_elbow_position"),
+        A_DEFFLOAT,
+        A_NULL
+    );
+
+    class_addmethod (
+        leapmotion_class,
+        (t_method) leapmotionSetHandsArmWristPositionFlag,
+        gensym ("arms_wrist_position"),
+        A_DEFFLOAT,
+        A_NULL
+    );
+
+    class_addmethod (
+        leapmotion_class,
+        (t_method) leapmotionSetHandsArmWidthFlag,
+        gensym ("arms_width"),
+        A_DEFFLOAT,
+        A_NULL
+    );
+
     class_addmethod (
         leapmotion_class,
         (t_method) leapmotionSetHandsTypeFlag,
@@ -270,6 +315,46 @@ static void leapmotionSetGeneralFlag (t_leapmotion* x, t_float state)
 
 
 // set methods: hands
+static void leapmotionSetHandsArmCenterFlag (t_leapmotion* x, t_float state)
+{
+    state = (state < 0.0) ? 0.0 : state;
+    state = (state > 1.0) ? 1.0 : state;
+
+    x->x_handsArmCenterFlag = state;
+}
+
+static void leapmotionSetHandsArmDirectionFlag (t_leapmotion* x, t_float state)
+{
+    state = (state < 0.0) ? 0.0 : state;
+    state = (state > 1.0) ? 1.0 : state;
+
+    x->x_handsArmDirectionFlag = state;
+}
+
+static void leapmotionSetHandsArmElbowPositionFlag (t_leapmotion* x, t_float state)
+{
+    state = (state < 0.0) ? 0.0 : state;
+    state = (state > 1.0) ? 1.0 : state;
+
+    x->x_handsArmElbowPositionFlag = state;
+}
+
+static void leapmotionSetHandsArmWristPositionFlag (t_leapmotion* x, t_float state)
+{
+    state = (state < 0.0) ? 0.0 : state;
+    state = (state > 1.0) ? 1.0 : state;
+
+    x->x_handsArmWristPositionFlag = state;
+}
+
+static void leapmotionSetHandsArmWidthFlag (t_leapmotion* x, t_float state)
+{
+    state = (state < 0.0) ? 0.0 : state;
+    state = (state > 1.0) ? 1.0 : state;
+
+    x->x_handsArmWidthFlag = state;
+}
+
 static void leapmotionSetHandsTypeFlag (t_leapmotion* x, t_float state)
 {
     state = (state < 0.0) ? 0.0 : state;
@@ -485,30 +570,36 @@ static void leapmotionInfo (t_leapmotion* x)
 {
     post ("\n\n[leapmotion] %s\n", PDLEAPMOTION_VERSION);
 
-    post ("general: %1.0f\n", x->x_generalFlag);
+    post ("general: %i\n", x->x_generalFlag);
 
-    post ("hands_type: %1.0f", x->x_handsTypeFlag);
-    post ("hands_sphere_radius: %1.0f", x->x_handsSphereRadiusFlag);
-    post ("hands_sphere_center: %1.0f", x->x_handsSphereCenterFlag);
-    post ("hands_direction: %1.0f", x->x_handsDirectionFlag);
-    post ("hands_palm_normal: %1.0f", x->x_handsPalmNormalFlag);
-    post ("hands_palm_position: %1.0f", x->x_handsPalmPositionFlag);
-    post ("hands_palm_velocity: %1.0f", x->x_handsPalmVelocityFlag);
-    post ("hands_tool_count: %1.0f", x->x_handsToolCountFlag);
-    post ("hands_finger_count: %1.0f\n", x->x_handsFingerCountFlag);
+    post ("arms_center: %i", x->x_handsArmCenterFlag);
+    post ("arms_direction: %i", x->x_handsArmDirectionFlag);
+    post ("arms_elbow_position: %i", x->x_handsArmElbowPositionFlag);
+    post ("arms_wrist_position: %i", x->x_handsArmWristPositionFlag);
+    post ("arms_width: %i\n", x->x_handsArmWidthFlag);
 
-    post ("fingers_direction: %1.0f", x->x_fingersDirectionFlag);
-    post ("fingers_position: %1.0f", x->x_fingersPositionFlag);
-    post ("fingers_velocity: %1.0f", x->x_fingersVelocityFlag);
-    post ("fingers_size: %1.0f\n", x->x_fingersSizeFlag);
+    post ("hands_type: %i", x->x_handsTypeFlag);
+    post ("hands_sphere_radius: %i", x->x_handsSphereRadiusFlag);
+    post ("hands_sphere_center: %i", x->x_handsSphereCenterFlag);
+    post ("hands_direction: %i", x->x_handsDirectionFlag);
+    post ("hands_palm_normal: %i", x->x_handsPalmNormalFlag);
+    post ("hands_palm_position: %i", x->x_handsPalmPositionFlag);
+    post ("hands_palm_velocity: %i", x->x_handsPalmVelocityFlag);
+    post ("hands_tool_count: %i", x->x_handsToolCountFlag);
+    post ("hands_finger_count: %i\n", x->x_handsFingerCountFlag);
 
-    post ("tools_direction: %1.0f", x->x_toolsDirectionFlag);
-    post ("tools_position: %1.0f", x->x_toolsPositionFlag);
-    post ("tools_velocity: %1.0f", x->x_toolsVelocityFlag);
-    post ("tools_size: %1.0f\n", x->x_toolsSizeFlag);
+    post ("fingers_direction: %i", x->x_fingersDirectionFlag);
+    post ("fingers_position: %i", x->x_fingersPositionFlag);
+    post ("fingers_velocity: %i", x->x_fingersVelocityFlag);
+    post ("fingers_size: %i\n", x->x_fingersSizeFlag);
 
-    post ("gesture_count: %1.0f", x->x_gestureCountFlag);
-    // need to post state as an integer based on isGestureEnabled return type
+    post ("tools_direction: %i", x->x_toolsDirectionFlag);
+    post ("tools_position: %i", x->x_toolsPositionFlag);
+    post ("tools_velocity: %i", x->x_toolsVelocityFlag);
+    post ("tools_size: %i\n", x->x_toolsSizeFlag);
+
+    post ("gesture_count: %i", x->x_gestureCountFlag);
+
     post ("gestures/TYPE_CIRCLE: %i", x->x_leapMotionObjPtr->m_controller.isGestureEnabled (Leap::Gesture::TYPE_CIRCLE));
     post ("gestures/TYPE_SWIPE: %i", x->x_leapMotionObjPtr->m_controller.isGestureEnabled (Leap::Gesture::TYPE_SWIPE));
     post ("gestures/TYPE_KEY_TAP: %i", x->x_leapMotionObjPtr->m_controller.isGestureEnabled (Leap::Gesture::TYPE_KEY_TAP));
@@ -659,6 +750,9 @@ static void leapmotionProcessHands (t_leapmotion* x, Leap::Frame frame)
         numFingersPerHand = fingerList.count();
         numToolsPerHand = toolList.count();
 
+        // process arm per hand
+        leapmotionProcessArm (x, handIdx, hand);
+
         if (x->x_handsTypeFlag)
         {
             SETFLOAT (&handInfo[0], handIdx);
@@ -779,12 +873,83 @@ static void leapmotionProcessHands (t_leapmotion* x, Leap::Frame frame)
 
         // process fingers per hand
         if (numFingersPerHand)
-            leapmotionProcessFingers (x, frame, handIdx, fingerList);
+            leapmotionProcessFingers (x, handIdx, fingerList);
+    }
+}
+
+// process arm data
+static void leapmotionProcessArm (t_leapmotion* x, int handIdx, Leap::Hand hand)
+{
+    Leap::Arm arm = hand.arm();
+    int numArmInfoAtoms = 6;
+    t_atom armInfo[numArmInfoAtoms];
+
+    // center
+    if (x->x_handsArmCenterFlag)
+    {
+        SETFLOAT (&armInfo[0], (t_float) handIdx);
+        SETSYMBOL (&armInfo[1], gensym ("arm"));
+        SETSYMBOL (&armInfo[2], gensym ("center"));
+        SETFLOAT (&armInfo[3], (t_float) arm.center().x);
+        SETFLOAT (&armInfo[4], (t_float) arm.center().y);
+        SETFLOAT (&armInfo[5], (t_float) arm.center().z);
+
+        outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numArmInfoAtoms, armInfo);
+    }
+
+    // direction
+    if (x->x_handsArmDirectionFlag)
+    {
+        SETFLOAT (&armInfo[0], (t_float) handIdx);
+        SETSYMBOL (&armInfo[1], gensym ("arm"));
+        SETSYMBOL (&armInfo[2], gensym ("direction"));
+        SETFLOAT (&armInfo[3], (t_float) arm.direction().x);
+        SETFLOAT (&armInfo[4], (t_float) arm.direction().y);
+        SETFLOAT (&armInfo[5], (t_float) arm.direction().z);
+
+        outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numArmInfoAtoms, armInfo);
+    }
+
+    // elbow_position
+    if (x->x_handsArmElbowPositionFlag)
+    {
+        SETFLOAT (&armInfo[0], (t_float) handIdx);
+        SETSYMBOL (&armInfo[1], gensym ("arm"));
+        SETSYMBOL (&armInfo[2], gensym ("elbow_position"));
+        SETFLOAT (&armInfo[3], (t_float) arm.elbowPosition().x);
+        SETFLOAT (&armInfo[4], (t_float) arm.elbowPosition().y);
+        SETFLOAT (&armInfo[5], (t_float) arm.elbowPosition().z);
+
+        outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numArmInfoAtoms, armInfo);
+    }
+
+    // wrist_position
+    if (x->x_handsArmWristPositionFlag)
+    {
+        SETFLOAT (&armInfo[0], (t_float) handIdx);
+        SETSYMBOL (&armInfo[1], gensym ("arm"));
+        SETSYMBOL (&armInfo[2], gensym ("wrist_position"));
+        SETFLOAT (&armInfo[3], (t_float) arm.wristPosition().x);
+        SETFLOAT (&armInfo[4], (t_float) arm.wristPosition().y);
+        SETFLOAT (&armInfo[5], (t_float) arm.wristPosition().z);
+
+        outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numArmInfoAtoms, armInfo);
+    }
+
+    // width
+    if (x->x_handsArmWidthFlag)
+    {
+        SETFLOAT (&armInfo[0], (t_float) handIdx);
+        SETSYMBOL (&armInfo[1], gensym ("arm"));
+        SETSYMBOL (&armInfo[2], gensym ("width"));
+        SETFLOAT (&armInfo[3], (t_float) arm.width());
+
+        outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numArmInfoAtoms - 2, armInfo);
     }
 }
 
 // process fingers
-static void leapmotionProcessFingers (t_leapmotion* x, Leap::Frame frame, int handIdx, Leap::FingerList fingerList)
+static void leapmotionProcessFingers (t_leapmotion* x, int handIdx, Leap::FingerList fingerList)
 {
     for (int fingerIdx = 0; fingerIdx < fingerList.count(); fingerIdx++)
     {

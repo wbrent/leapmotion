@@ -18,4 +18,4 @@ public:
 
 };
 
-#endif
+#endif // LEAP_MOTION_OBJ_H
