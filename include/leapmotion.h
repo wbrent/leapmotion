@@ -109,6 +109,7 @@ static void leapmotionSetToolsSizeFlag (t_leapmotion* x, t_float state);
 // set methods: gestures
 static void leapmotionSetGestureCountFlag (t_leapmotion* x, t_float state);
 static void leapmotionSetGestureFlags (t_leapmotion* x, t_symbol* s, int argc, t_atom* argv);
+static void leapmotionSetGestureConfig (t_leapmotion* x, t_symbol* key, t_float value);
 
 // post object info
 static void leapmotionInfo (t_leapmotion* x);

@@ -364,6 +364,15 @@ void leapmotion_setup (void)
         A_GIMME,
         A_NULL
     );
+
+    class_addmethod (
+        leapmotion_class,
+        (t_method) leapmotionSetGestureConfig,
+        gensym ("gesture_config"),
+        A_SYMBOL,
+        A_DEFFLOAT,
+        A_NULL
+    );
 }
 
 
@@ -684,6 +693,35 @@ static void leapmotionSetGestureFlags (t_leapmotion* x, t_symbol* s, int argc, t
     }
 }
 
+static void leapmotionSetGestureConfig (t_leapmotion* x, t_symbol* key, t_float value)
+{
+    if (! strcmp (key->s_name, "circle_min_radius"))
+        x->x_leapMotionObjPtr->m_controller.config().setFloat("Gesture.Circle.MinRadius", value);
+    else if (! strcmp (key->s_name, "circle_min_arc"))
+        x->x_leapMotionObjPtr->m_controller.config().setFloat("Gesture.Circle.MinArc", value);
+    else if (! strcmp (key->s_name, "swipe_min_length"))
+        x->x_leapMotionObjPtr->m_controller.config().setFloat("Gesture.Swipe.MinLength", value);
+    else if (! strcmp (key->s_name, "swipe_min_velocity"))
+        x->x_leapMotionObjPtr->m_controller.config().setFloat("Gesture.Swipe.MinVelocity", value);
+    else if (! strcmp (key->s_name, "key_tap_min_down_velocity"))
+        x->x_leapMotionObjPtr->m_controller.config().setFloat("Gesture.KeyTap.MinDownVelocity", value);
+    else if (! strcmp (key->s_name, "key_tap_history_seconds"))
+        x->x_leapMotionObjPtr->m_controller.config().setFloat("Gesture.KeyTap.HistorySeconds", value);
+    else if (! strcmp (key->s_name, "key_tap_min_distance"))
+        x->x_leapMotionObjPtr->m_controller.config().setFloat("Gesture.KeyTap.MinDistance", value);
+    else if (! strcmp (key->s_name, "screen_tap_min_forward_velocity"))
+        x->x_leapMotionObjPtr->m_controller.config().setFloat("Gesture.ScreenTap.MinForwardVelocity", value);
+    else if (! strcmp (key->s_name, "screen_tap_history_seconds"))
+        x->x_leapMotionObjPtr->m_controller.config().setFloat("Gesture.ScreenTap.HistorySeconds", value);
+    else if (! strcmp (key->s_name, "screen_tap_min_distance"))
+        x->x_leapMotionObjPtr->m_controller.config().setFloat("Gesture.ScreenTap.MinDistance", value);
+    else
+        pd_error (x, "[%s]: Unknown Gesture configuration parameter: %s", x->x_objSymbol->s_name, key->s_name);
+
+    // must save for the change to take effect
+    x->x_leapMotionObjPtr->m_controller.config().save();
+}
+
 
 // info method
 static void leapmotionInfo (t_leapmotion* x)
@@ -730,7 +768,18 @@ static void leapmotionInfo (t_leapmotion* x)
     post ("gestures/TYPE_CIRCLE: %i", x->x_leapMotionObjPtr->m_controller.isGestureEnabled (Leap::Gesture::TYPE_CIRCLE));
     post ("gestures/TYPE_SWIPE: %i", x->x_leapMotionObjPtr->m_controller.isGestureEnabled (Leap::Gesture::TYPE_SWIPE));
     post ("gestures/TYPE_KEY_TAP: %i", x->x_leapMotionObjPtr->m_controller.isGestureEnabled (Leap::Gesture::TYPE_KEY_TAP));
-    post ("gestures/TYPE_SCREEN_TAP: %i\n\n", x->x_leapMotionObjPtr->m_controller.isGestureEnabled (Leap::Gesture::TYPE_SCREEN_TAP));
+    post ("gestures/TYPE_SCREEN_TAP: %i\n", x->x_leapMotionObjPtr->m_controller.isGestureEnabled (Leap::Gesture::TYPE_SCREEN_TAP));
+
+    post ("Gesture.Circle.MinRadius: %0.2f mm", x->x_leapMotionObjPtr->m_controller.config().getFloat("Gesture.Circle.MinRadius"));
+    post ("Gesture.Circle.MinArc: %0.2f radians\n", x->x_leapMotionObjPtr->m_controller.config().getFloat("Gesture.Circle.MinArc"));
+    post ("Gesture.Swipe.MinLength: %0.2f mm", x->x_leapMotionObjPtr->m_controller.config().getFloat("Gesture.Swipe.MinLength"));
+    post ("Gesture.Swipe.MinVelocity: %0.2f mm/s\n", x->x_leapMotionObjPtr->m_controller.config().getFloat("Gesture.Swipe.MinVelocity"));
+    post ("Gesture.KeyTap.MinDownVelocity: %0.2f mm/s", x->x_leapMotionObjPtr->m_controller.config().getFloat("Gesture.KeyTap.MinDownVelocity"));
+    post ("Gesture.KeyTap.HistorySeconds: %0.2f s", x->x_leapMotionObjPtr->m_controller.config().getFloat("Gesture.KeyTap.HistorySeconds"));
+    post ("Gesture.KeyTap.MinDistance: %0.2f mm\n", x->x_leapMotionObjPtr->m_controller.config().getFloat("Gesture.KeyTap.MinDistance"));
+    post ("Gesture.ScreenTap.MinForwardVelocity: %0.2f mm/s", x->x_leapMotionObjPtr->m_controller.config().getFloat("Gesture.ScreenTap.MinForwardVelocity"));
+    post ("Gesture.ScreenTap.HistorySeconds: %0.2f s", x->x_leapMotionObjPtr->m_controller.config().getFloat("Gesture.ScreenTap.HistorySeconds"));
+    post ("Gesture.ScreenTap.MinDistance: %0.2f mm\n\n", x->x_leapMotionObjPtr->m_controller.config().getFloat("Gesture.ScreenTap.MinDistance"));
 }
 
 
