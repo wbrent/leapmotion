@@ -626,8 +626,8 @@ static void leapmotionInfo (t_leapmotion* x)
     post ("fingers_direction: %i", x->x_fingersDirectionFlag);
     post ("fingers_position: %i", x->x_fingersPositionFlag);
     post ("fingers_velocity: %i", x->x_fingersVelocityFlag);
-    post ("fingers_size: %i\n", x->x_fingersSizeFlag);
-    post ("fingers_is_extended: %i", x->x_fingersIsExtendedFlag);
+    post ("fingers_size: %i", x->x_fingersSizeFlag);
+    post ("fingers_is_extended: %i\n", x->x_fingersIsExtendedFlag);
 
     post ("tools_direction: %i", x->x_toolsDirectionFlag);
     post ("tools_position: %i", x->x_toolsPositionFlag);
