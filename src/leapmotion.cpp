@@ -1073,14 +1073,15 @@ static void leapmotionProcessTools (t_leapmotion* x, Leap::Frame frame)
 // process general data
 static void leapmotionProcessGeneral (t_leapmotion* x, Leap::Frame frame)
 {
-    int numGeneralInfoAtoms = 5;
+    int numGeneralInfoAtoms = 6;
     t_atom generalInfo[numGeneralInfoAtoms];
 
     SETFLOAT (&generalInfo[0], (t_float) frame.id());
     SETFLOAT (&generalInfo[1], (t_float) frame.timestamp());
-    SETFLOAT (&generalInfo[2], (t_float) frame.hands().count());
-    SETFLOAT (&generalInfo[3], (t_float) frame.tools().count());
-    SETFLOAT (&generalInfo[4], (t_float) frame.gestures().count());
+    SETFLOAT (&generalInfo[2], (t_float) frame.currentFramesPerSecond());
+    SETFLOAT (&generalInfo[3], (t_float) frame.hands().count());
+    SETFLOAT (&generalInfo[4], (t_float) frame.tools().count());
+    SETFLOAT (&generalInfo[5], (t_float) frame.gestures().count());
 
     outlet_list(x->x_outletGeneral, 0, numGeneralInfoAtoms, &generalInfo[0]);
 }
