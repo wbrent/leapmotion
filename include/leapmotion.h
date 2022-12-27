@@ -32,9 +32,14 @@ typedef struct _leapmotion
     uint8_t x_handsDirectionFlag;
     uint8_t x_handsPalmNormalFlag;
     uint8_t x_handsPalmPositionFlag;
+    uint8_t x_handsStabilizedPalmPositionFlag;
     uint8_t x_handsPalmVelocityFlag;
+    uint8_t x_handsPalmWidthFlag;
     uint8_t x_handsFingerCountFlag;
     uint8_t x_handsToolCountFlag;
+    uint8_t x_handsGrabStrengthFlag;
+    uint8_t x_handsPinchStrengthFlag;
+    uint8_t x_handsTimeVisibleFlag;
 
     uint8_t x_fingersTypeFlag;
     uint8_t x_fingersDirectionFlag;
@@ -78,9 +83,14 @@ static void leapmotionSetHandsSphereCenterFlag (t_leapmotion* x, t_float state);
 static void leapmotionSetHandsDirectionFlag (t_leapmotion* x, t_float state);
 static void leapmotionSetHandsPalmNormalFlag (t_leapmotion* x, t_float state);
 static void leapmotionSetHandsPalmPositionFlag (t_leapmotion* x, t_float state);
+static void leapmotionSetHandsStabilizedPalmPositionFlag (t_leapmotion* x, t_float state);
 static void leapmotionSetHandsPalmVelocityFlag (t_leapmotion* x, t_float state);
+static void leapmotionSetHandsPalmWidthFlag (t_leapmotion* x, t_float state);
 static void leapmotionSetHandsFingerCountFlag (t_leapmotion* x, t_float state);
 static void leapmotionSetHandsToolCountFlag (t_leapmotion* x, t_float state);
+static void leapmotionSetHandsGrabStrengthFlag (t_leapmotion* x, t_float state);
+static void leapmotionSetHandsPinchStrengthFlag (t_leapmotion* x, t_float state);
+static void leapmotionSetHandsTimeVisibleFlag (t_leapmotion* x, t_float state);
 
 // set methods: fingers
 static void leapmotionSetFingersTypeFlag (t_leapmotion* x, t_float state);

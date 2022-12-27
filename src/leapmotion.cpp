@@ -27,9 +27,14 @@ static void* leapmotion_new (t_symbol* s, int argc, t_atom* argv)
     x->x_handsDirectionFlag = 0;
     x->x_handsPalmNormalFlag = 0;
     x->x_handsPalmPositionFlag = 1;
+    x->x_handsStabilizedPalmPositionFlag = 0;
     x->x_handsPalmVelocityFlag = 0;
+    x->x_handsPalmWidthFlag = 0;
     x->x_handsFingerCountFlag = 0;
     x->x_handsToolCountFlag = 0;
+    x->x_handsGrabStrengthFlag = 0;
+    x->x_handsPinchStrengthFlag = 0;
+    x->x_handsTimeVisibleFlag = 0;
 
     x->x_fingersTypeFlag = 0;
     x->x_fingersDirectionFlag = 0;
@@ -204,8 +209,24 @@ void leapmotion_setup (void)
 
     class_addmethod (
         leapmotion_class,
+        (t_method) leapmotionSetHandsStabilizedPalmPositionFlag,
+        gensym ("hands_stabilized_palm_position"),
+        A_DEFFLOAT,
+        A_NULL
+    );
+
+    class_addmethod (
+        leapmotion_class,
         (t_method) leapmotionSetHandsPalmVelocityFlag,
         gensym ("hands_palm_velocity"),
+        A_DEFFLOAT,
+        A_NULL
+    );
+
+    class_addmethod (
+        leapmotion_class,
+        (t_method) leapmotionSetHandsPalmWidthFlag,
+        gensym ("hands_palm_width"),
         A_DEFFLOAT,
         A_NULL
     );
@@ -222,6 +243,30 @@ void leapmotion_setup (void)
         leapmotion_class,
         (t_method) leapmotionSetHandsToolCountFlag,
         gensym ("hands_tool_count"),
+        A_DEFFLOAT,
+        A_NULL
+    );
+
+    class_addmethod (
+        leapmotion_class,
+        (t_method) leapmotionSetHandsGrabStrengthFlag,
+        gensym ("hands_grab_strength"),
+        A_DEFFLOAT,
+        A_NULL
+    );
+
+    class_addmethod (
+        leapmotion_class,
+        (t_method) leapmotionSetHandsPinchStrengthFlag,
+        gensym ("hands_pinch_strength"),
+        A_DEFFLOAT,
+        A_NULL
+    );
+
+    class_addmethod (
+        leapmotion_class,
+        (t_method) leapmotionSetHandsTimeVisibleFlag,
+        gensym ("hands_time_visible"),
         A_DEFFLOAT,
         A_NULL
     );
@@ -421,12 +466,28 @@ static void leapmotionSetHandsPalmPositionFlag (t_leapmotion* x, t_float state)
     x->x_handsPalmPositionFlag = state;
 }
 
+static void leapmotionSetHandsStabilizedPalmPositionFlag (t_leapmotion* x, t_float state)
+{
+    state = (state < 0.0) ? 0.0 : state;
+    state = (state > 1.0) ? 1.0 : state;
+
+    x->x_handsStabilizedPalmPositionFlag = state;
+}
+
 static void leapmotionSetHandsPalmVelocityFlag (t_leapmotion* x, t_float state)
 {
     state = (state < 0.0) ? 0.0 : state;
     state = (state > 1.0) ? 1.0 : state;
 
     x->x_handsPalmVelocityFlag = state;
+}
+
+static void leapmotionSetHandsPalmWidthFlag (t_leapmotion* x, t_float state)
+{
+    state = (state < 0.0) ? 0.0 : state;
+    state = (state > 1.0) ? 1.0 : state;
+
+    x->x_handsPalmWidthFlag = state;
 }
 
 static void leapmotionSetHandsFingerCountFlag (t_leapmotion* x, t_float state)
@@ -444,6 +505,31 @@ static void leapmotionSetHandsToolCountFlag (t_leapmotion* x, t_float state)
 
     x->x_handsToolCountFlag = state;
 }
+
+static void leapmotionSetHandsGrabStrengthFlag (t_leapmotion* x, t_float state)
+{
+    state = (state < 0.0) ? 0.0 : state;
+    state = (state > 1.0) ? 1.0 : state;
+
+    x->x_handsGrabStrengthFlag = state;
+}
+
+static void leapmotionSetHandsPinchStrengthFlag (t_leapmotion* x, t_float state)
+{
+    state = (state < 0.0) ? 0.0 : state;
+    state = (state > 1.0) ? 1.0 : state;
+
+    x->x_handsPinchStrengthFlag = state;
+}
+
+static void leapmotionSetHandsTimeVisibleFlag (t_leapmotion* x, t_float state)
+{
+    state = (state < 0.0) ? 0.0 : state;
+    state = (state > 1.0) ? 1.0 : state;
+
+    x->x_handsTimeVisibleFlag = state;
+}
+
 
 // set methods: fingers
 static void leapmotionSetFingersTypeFlag (t_leapmotion* x, t_float state)
@@ -618,9 +704,14 @@ static void leapmotionInfo (t_leapmotion* x)
     post ("hands_direction: %i", x->x_handsDirectionFlag);
     post ("hands_palm_normal: %i", x->x_handsPalmNormalFlag);
     post ("hands_palm_position: %i", x->x_handsPalmPositionFlag);
+    post ("hands_stabilized_palm_position: %i", x->x_handsStabilizedPalmPositionFlag);
     post ("hands_palm_velocity: %i", x->x_handsPalmVelocityFlag);
+    post ("hands_palm_width: %i", x->x_handsPalmWidthFlag);
     post ("hands_tool_count: %i", x->x_handsToolCountFlag);
-    post ("hands_finger_count: %i\n", x->x_handsFingerCountFlag);
+    post ("hands_finger_count: %i", x->x_handsFingerCountFlag);
+    post ("hands_grab_strength: %i", x->x_handsGrabStrengthFlag);
+    post ("hands_pinch_strength: %i", x->x_handsPinchStrengthFlag);
+    post ("hands_time_visible: %i\n", x->x_handsTimeVisibleFlag);
 
     post ("fingers_type: %i", x->x_fingersTypeFlag);
     post ("fingers_direction: %i", x->x_fingersDirectionFlag);
@@ -774,7 +865,7 @@ static void leapmotionProcessHands (t_leapmotion* x, Leap::Frame frame)
     for (int handIdx = 0; handIdx < handList.count(); handIdx++)
     {
         int numFingersPerHand, numToolsPerHand;
-        int numHandInfoAtoms = 5;
+        int numHandInfoAtoms = 6;
         t_atom handInfo[numHandInfoAtoms];
 
         Leap::Hand hand = handList[handIdx];
@@ -804,7 +895,7 @@ static void leapmotionProcessHands (t_leapmotion* x, Leap::Frame frame)
             else
                 SETSYMBOL (&handInfo[2], gensym ("invalid"));
 
-            outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numHandInfoAtoms - 2, handInfo);
+            outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numHandInfoAtoms - 3, handInfo);
         }
 
         // sphere radius
@@ -812,8 +903,9 @@ static void leapmotionProcessHands (t_leapmotion* x, Leap::Frame frame)
         {
             // sphere radius
             SETFLOAT (&handInfo[0], handIdx);
-            SETSYMBOL (&handInfo[1], gensym ("sphere_radius"));
-            SETFLOAT (&handInfo[2], hand.sphereRadius());
+            SETSYMBOL (&handInfo[1], gensym ("sphere"));
+            SETSYMBOL (&handInfo[2], gensym ("radius"));
+            SETFLOAT (&handInfo[3], hand.sphereRadius());
 
             outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numHandInfoAtoms - 2, handInfo);
         }
@@ -823,10 +915,11 @@ static void leapmotionProcessHands (t_leapmotion* x, Leap::Frame frame)
         {
             // sphere center
             SETFLOAT (&handInfo[0], handIdx);
-            SETSYMBOL (&handInfo[1], gensym ("sphere_center"));
-            SETFLOAT (&handInfo[2], hand.sphereCenter().x);
-            SETFLOAT (&handInfo[3], hand.sphereCenter().y);
-            SETFLOAT (&handInfo[4], hand.sphereCenter().z);
+            SETSYMBOL (&handInfo[1], gensym ("sphere"));
+            SETSYMBOL (&handInfo[2], gensym ("center"));
+            SETFLOAT (&handInfo[3], hand.sphereCenter().x);
+            SETFLOAT (&handInfo[4], hand.sphereCenter().y);
+            SETFLOAT (&handInfo[5], hand.sphereCenter().z);
 
             outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numHandInfoAtoms, handInfo);
         }
@@ -840,17 +933,18 @@ static void leapmotionProcessHands (t_leapmotion* x, Leap::Frame frame)
             SETFLOAT (&handInfo[3], hand.direction().y);
             SETFLOAT (&handInfo[4], hand.direction().z);
 
-            outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numHandInfoAtoms, handInfo);
+            outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numHandInfoAtoms - 1, handInfo);
         }
 
         // palm normal
         if (x->x_handsPalmNormalFlag)
         {
             SETFLOAT (&handInfo[0], handIdx);
-            SETSYMBOL (&handInfo[1], gensym ("palm_normal"));
-            SETFLOAT (&handInfo[2], hand.palmNormal().x);
-            SETFLOAT (&handInfo[3], hand.palmNormal().y);
-            SETFLOAT (&handInfo[4], hand.palmNormal().z);
+            SETSYMBOL (&handInfo[1], gensym ("palm"));
+            SETSYMBOL (&handInfo[2], gensym ("normal"));
+            SETFLOAT (&handInfo[3], hand.palmNormal().x);
+            SETFLOAT (&handInfo[4], hand.palmNormal().y);
+            SETFLOAT (&handInfo[5], hand.palmNormal().z);
 
             outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numHandInfoAtoms, handInfo);
         }
@@ -859,10 +953,24 @@ static void leapmotionProcessHands (t_leapmotion* x, Leap::Frame frame)
         if (x->x_handsPalmPositionFlag)
         {
             SETFLOAT (&handInfo[0], handIdx);
-            SETSYMBOL (&handInfo[1], gensym ("palm_position"));
-            SETFLOAT (&handInfo[2], hand.palmPosition().x);
-            SETFLOAT (&handInfo[3], hand.palmPosition().y);
-            SETFLOAT (&handInfo[4], hand.palmPosition().z);
+            SETSYMBOL (&handInfo[1], gensym ("palm"));
+            SETSYMBOL (&handInfo[2], gensym ("position"));
+            SETFLOAT (&handInfo[3], hand.palmPosition().x);
+            SETFLOAT (&handInfo[4], hand.palmPosition().y);
+            SETFLOAT (&handInfo[5], hand.palmPosition().z);
+
+            outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numHandInfoAtoms, handInfo);
+        }
+
+        // stabilized palm position
+        if (x->x_handsStabilizedPalmPositionFlag)
+        {
+            SETFLOAT (&handInfo[0], handIdx);
+            SETSYMBOL (&handInfo[1], gensym ("palm"));
+            SETSYMBOL (&handInfo[2], gensym ("stabilized_position"));
+            SETFLOAT (&handInfo[3], hand.stabilizedPalmPosition().x);
+            SETFLOAT (&handInfo[4], hand.stabilizedPalmPosition().y);
+            SETFLOAT (&handInfo[5], hand.stabilizedPalmPosition().z);
 
             outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numHandInfoAtoms, handInfo);
         }
@@ -871,12 +979,24 @@ static void leapmotionProcessHands (t_leapmotion* x, Leap::Frame frame)
         if (x->x_handsPalmVelocityFlag)
         {
             SETFLOAT (&handInfo[0], handIdx);
-            SETSYMBOL (&handInfo[1], gensym ("palm_velocity"));
-            SETFLOAT (&handInfo[2], hand.palmVelocity().x);
-            SETFLOAT (&handInfo[3], hand.palmVelocity().y);
-            SETFLOAT (&handInfo[4], hand.palmVelocity().z);
+            SETSYMBOL (&handInfo[1], gensym ("palm"));
+            SETSYMBOL (&handInfo[2], gensym ("velocity"));
+            SETFLOAT (&handInfo[3], hand.palmVelocity().x);
+            SETFLOAT (&handInfo[4], hand.palmVelocity().y);
+            SETFLOAT (&handInfo[5], hand.palmVelocity().z);
 
             outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numHandInfoAtoms, handInfo);
+        }
+
+        // palm width
+        if (x->x_handsPalmWidthFlag)
+        {
+            SETFLOAT (&handInfo[0], handIdx);
+            SETSYMBOL (&handInfo[1], gensym ("palm"));
+            SETSYMBOL (&handInfo[2], gensym ("width"));
+            SETFLOAT (&handInfo[3], hand.palmWidth());
+
+            outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numHandInfoAtoms - 2, handInfo);
         }
 
         // finger count
@@ -894,7 +1014,7 @@ static void leapmotionProcessHands (t_leapmotion* x, Leap::Frame frame)
             SETSYMBOL (&handInfo[1], gensym ("finger_count"));
             SETFLOAT (&handInfo[2], fingerCount);
 
-            outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numHandInfoAtoms - 2, handInfo);
+            outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numHandInfoAtoms - 3, handInfo);
         }
 
         // tool count
@@ -904,7 +1024,37 @@ static void leapmotionProcessHands (t_leapmotion* x, Leap::Frame frame)
             SETSYMBOL (&handInfo[1], gensym ("tool_count"));
             SETFLOAT (&handInfo[2], numToolsPerHand);
 
-            outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numHandInfoAtoms - 2, handInfo);
+            outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numHandInfoAtoms - 3, handInfo);
+        }
+
+        // grab strength
+        if (x->x_handsGrabStrengthFlag)
+        {
+            SETFLOAT (&handInfo[0], handIdx);
+            SETSYMBOL (&handInfo[1], gensym ("grab_strength"));
+            SETFLOAT (&handInfo[2], hand.grabStrength());
+
+            outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numHandInfoAtoms - 3, handInfo);
+        }
+
+        // pinch strength
+        if (x->x_handsPinchStrengthFlag)
+        {
+            SETFLOAT (&handInfo[0], handIdx);
+            SETSYMBOL (&handInfo[1], gensym ("pinch_strength"));
+            SETFLOAT (&handInfo[2], hand.pinchStrength());
+
+            outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numHandInfoAtoms - 3, handInfo);
+        }
+
+        // time visible
+        if (x->x_handsTimeVisibleFlag)
+        {
+            SETFLOAT (&handInfo[0], handIdx);
+            SETSYMBOL (&handInfo[1], gensym ("time_visible"));
+            SETFLOAT (&handInfo[2], hand.timeVisible());
+
+            outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numHandInfoAtoms - 3, handInfo);
         }
 
         // process fingers per hand
