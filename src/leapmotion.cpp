@@ -31,10 +31,12 @@ static void* leapmotion_new (t_symbol* s, int argc, t_atom* argv)
     x->x_handsFingerCountFlag = 0;
     x->x_handsToolCountFlag = 0;
 
+    x->x_fingersTypeFlag = 0;
     x->x_fingersDirectionFlag = 0;
     x->x_fingersPositionFlag = 0;
     x->x_fingersVelocityFlag = 0;
     x->x_fingersSizeFlag = 0;
+    x->x_fingersIsExtendedFlag = 0;
 
     x->x_toolsDirectionFlag = 0;
     x->x_toolsPositionFlag = 0;
@@ -228,6 +230,14 @@ void leapmotion_setup (void)
     // fingers
     class_addmethod (
         leapmotion_class,
+        (t_method) leapmotionSetFingersTypeFlag,
+        gensym ("fingers_type"),
+        A_DEFFLOAT,
+        A_NULL
+    );
+
+    class_addmethod (
+        leapmotion_class,
         (t_method) leapmotionSetFingersDirectionFlag,
         gensym ("fingers_direction"),
         A_DEFFLOAT,
@@ -254,6 +264,14 @@ void leapmotion_setup (void)
         leapmotion_class,
         (t_method) leapmotionSetFingersSizeFlag,
         gensym ("fingers_size"),
+        A_DEFFLOAT,
+        A_NULL
+    );
+
+    class_addmethod (
+        leapmotion_class,
+        (t_method) leapmotionSetFingersIsExtendedFlag,
+        gensym ("fingers_is_extended"),
         A_DEFFLOAT,
         A_NULL
     );
@@ -428,6 +446,14 @@ static void leapmotionSetHandsToolCountFlag (t_leapmotion* x, t_float state)
 }
 
 // set methods: fingers
+static void leapmotionSetFingersTypeFlag (t_leapmotion* x, t_float state)
+{
+    state = (state < 0.0) ? 0.0 : state;
+    state = (state > 1.0) ? 1.0 : state;
+
+    x->x_fingersTypeFlag = state;
+}
+
 static void leapmotionSetFingersDirectionFlag (t_leapmotion* x, t_float state)
 {
     state = (state < 0.0) ? 0.0 : state;
@@ -458,6 +484,14 @@ static void leapmotionSetFingersSizeFlag (t_leapmotion* x, t_float state)
     state = (state > 1.0) ? 1.0 : state;
 
     x->x_fingersSizeFlag = state;
+}
+
+static void leapmotionSetFingersIsExtendedFlag (t_leapmotion* x, t_float state)
+{
+    state = (state < 0.0) ? 0.0 : state;
+    state = (state > 1.0) ? 1.0 : state;
+
+    x->x_fingersIsExtendedFlag = state;
 }
 
 // set methods: tools
@@ -588,10 +622,12 @@ static void leapmotionInfo (t_leapmotion* x)
     post ("hands_tool_count: %i", x->x_handsToolCountFlag);
     post ("hands_finger_count: %i\n", x->x_handsFingerCountFlag);
 
+    post ("fingers_type: %i", x->x_fingersTypeFlag);
     post ("fingers_direction: %i", x->x_fingersDirectionFlag);
     post ("fingers_position: %i", x->x_fingersPositionFlag);
     post ("fingers_velocity: %i", x->x_fingersVelocityFlag);
     post ("fingers_size: %i\n", x->x_fingersSizeFlag);
+    post ("fingers_is_extended: %i", x->x_fingersIsExtendedFlag);
 
     post ("tools_direction: %i", x->x_toolsDirectionFlag);
     post ("tools_position: %i", x->x_toolsPositionFlag);
@@ -957,12 +993,45 @@ static void leapmotionProcessFingers (t_leapmotion* x, int handIdx, Leap::Finger
         int numFingerInfoAtoms = 7;
         t_atom fingerInfo[numFingerInfoAtoms];
 
+        if (x->x_fingersTypeFlag)
+        {
+            Leap::Finger::Type fingerType = finger.type();
+
+            SETFLOAT (&fingerInfo[0], handIdx);
+            SETSYMBOL (&fingerInfo[1], gensym ("fingers"));
+            SETFLOAT (&fingerInfo[2], fingerIdx);
+            SETSYMBOL (&fingerInfo[3], gensym ("type"));
+
+            switch (fingerType)
+            {
+                case Leap::Finger::TYPE_THUMB:
+                    SETSYMBOL (&fingerInfo[4], gensym ("thumb"));
+                    break;
+                case Leap::Finger::TYPE_INDEX:
+                    SETSYMBOL (&fingerInfo[4], gensym ("index"));
+                    break;
+                case Leap::Finger::TYPE_MIDDLE:
+                    SETSYMBOL (&fingerInfo[4], gensym ("middle"));
+                    break;
+                case Leap::Finger::TYPE_RING:
+                    SETSYMBOL (&fingerInfo[4], gensym ("ring"));
+                    break;
+                case Leap::Finger::TYPE_PINKY:
+                    SETSYMBOL (&fingerInfo[4], gensym ("pinky"));
+                    break;
+                default:
+                    break;
+            }
+
+            outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numFingerInfoAtoms - 2, fingerInfo);
+        }
+
         if (x->x_fingersDirectionFlag)
         {
             SETFLOAT (&fingerInfo[0], handIdx);
             SETSYMBOL (&fingerInfo[1], gensym ("fingers"));
             // use Leap::Finger.type() to get stable finger indices where 0 is the thumb, and 4 is the pinky
-            SETFLOAT (&fingerInfo[2], finger.type());
+            SETFLOAT (&fingerInfo[2], fingerIdx);
             SETSYMBOL (&fingerInfo[3], gensym ("direction"));
             SETFLOAT (&fingerInfo[4], finger.direction().x);
             SETFLOAT (&fingerInfo[5], finger.direction().y);
@@ -975,7 +1044,7 @@ static void leapmotionProcessFingers (t_leapmotion* x, int handIdx, Leap::Finger
         {
             SETFLOAT (&fingerInfo[0], handIdx);
             SETSYMBOL (&fingerInfo[1], gensym ("fingers"));
-            SETFLOAT (&fingerInfo[2], finger.type());
+            SETFLOAT (&fingerInfo[2], fingerIdx);
             SETSYMBOL (&fingerInfo[3], gensym ("position"));
             SETFLOAT (&fingerInfo[4], finger.tipPosition().x);
             SETFLOAT (&fingerInfo[5], finger.tipPosition().y);
@@ -988,7 +1057,7 @@ static void leapmotionProcessFingers (t_leapmotion* x, int handIdx, Leap::Finger
         {
             SETFLOAT (&fingerInfo[0], handIdx);
             SETSYMBOL (&fingerInfo[1], gensym ("fingers"));
-            SETFLOAT (&fingerInfo[2], finger.type());
+            SETFLOAT (&fingerInfo[2], fingerIdx);
             SETSYMBOL (&fingerInfo[3], gensym ("velocity"));
             SETFLOAT (&fingerInfo[4], finger.tipVelocity().x);
             SETFLOAT (&fingerInfo[5], finger.tipVelocity().y);
@@ -1001,12 +1070,23 @@ static void leapmotionProcessFingers (t_leapmotion* x, int handIdx, Leap::Finger
         {
             SETFLOAT (&fingerInfo[0], handIdx);
             SETSYMBOL (&fingerInfo[1], gensym ("fingers"));
-            SETFLOAT (&fingerInfo[2], finger.type());
+            SETFLOAT (&fingerInfo[2], fingerIdx);
             SETSYMBOL (&fingerInfo[3], gensym ("size"));
             SETFLOAT (&fingerInfo[4], finger.width());
             SETFLOAT (&fingerInfo[5], finger.length());
 
             outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numFingerInfoAtoms - 1, fingerInfo);
+        }
+
+        if (x->x_fingersIsExtendedFlag)
+        {
+            SETFLOAT (&fingerInfo[0], handIdx);
+            SETSYMBOL (&fingerInfo[1], gensym ("fingers"));
+            SETFLOAT (&fingerInfo[2], fingerIdx);
+            SETSYMBOL (&fingerInfo[3], gensym ("is_extended"));
+            SETFLOAT (&fingerInfo[4], finger.isExtended());
+
+            outlet_anything(x->x_outletHandsFingersTools, gensym ("hand"), numFingerInfoAtoms - 2, fingerInfo);
         }
     }
 }

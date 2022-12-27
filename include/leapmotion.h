@@ -36,10 +36,12 @@ typedef struct _leapmotion
     uint8_t x_handsFingerCountFlag;
     uint8_t x_handsToolCountFlag;
 
+    uint8_t x_fingersTypeFlag;
     uint8_t x_fingersDirectionFlag;
     uint8_t x_fingersPositionFlag;
     uint8_t x_fingersVelocityFlag;
     uint8_t x_fingersSizeFlag;
+    uint8_t x_fingersIsExtendedFlag;
 
     uint8_t x_toolsDirectionFlag;
     uint8_t x_toolsPositionFlag;
@@ -81,10 +83,12 @@ static void leapmotionSetHandsFingerCountFlag (t_leapmotion* x, t_float state);
 static void leapmotionSetHandsToolCountFlag (t_leapmotion* x, t_float state);
 
 // set methods: fingers
+static void leapmotionSetFingersTypeFlag (t_leapmotion* x, t_float state);
 static void leapmotionSetFingersDirectionFlag (t_leapmotion* x, t_float state);
 static void leapmotionSetFingersPositionFlag (t_leapmotion* x, t_float state);
 static void leapmotionSetFingersVelocityFlag (t_leapmotion* x, t_float state);
 static void leapmotionSetFingersSizeFlag (t_leapmotion* x, t_float state);
+static void leapmotionSetFingersIsExtendedFlag (t_leapmotion* x, t_float state);
 
 // set methods: tools
 static void leapmotionSetToolsDirectionFlag (t_leapmotion* x, t_float state);

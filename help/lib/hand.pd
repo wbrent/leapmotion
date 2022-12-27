@@ -39,7 +39,7 @@
 #X obj 488 176 point 3;
 #X obj 551 176 point 4;
 #X text 433 151 fingers;
-#X obj 299 416 arm;
+#X obj 299 456 arm;
 #X obj 648 81 route type direction palm_position palm_velocity palm_normal sphere_radius sphere_center finger_count tool_count fingers arm;
 #X connect 0 0 41 0;
 #X connect 5 0 0 0;
@@ -71,4 +71,4 @@
 #X connect 41 9 37 0;
 #X connect 41 9 38 0;
 #X connect 41 10 40 0;
-#X coords 0 -1 1 1 524 490 1 100 100;
+#X coords 0 -1 1 1 524 530 1 100 100;
