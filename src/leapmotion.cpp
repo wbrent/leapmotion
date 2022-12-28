@@ -824,12 +824,10 @@ static void leapmotionProcessGestures (t_leapmotion* x, Leap::Frame frame)
 
     if (x->x_gestureCountFlag)
     {
-        int numGestureCountAtoms = 2;
-        t_atom gestureCount[numGestureCountAtoms];
+        t_atom gestureCount[1];
 
-        SETSYMBOL (&gestureCount[0], gensym ("count"));
-        SETFLOAT (&gestureCount[1], (t_float) numGesturesPerFrame);
-        outlet_list (x->x_outletGesture, 0, numGestureCountAtoms, &gestureCount[0]);
+        SETFLOAT (&gestureCount[0], (t_float) numGesturesPerFrame);
+        outlet_anything(x->x_outletGesture, gensym ("count"), 1, gestureCount);
     }
 
     for (int gestureIdx = 0; gestureIdx < numGesturesPerFrame; gestureIdx++)
@@ -852,7 +850,7 @@ static void leapmotionProcessGestures (t_leapmotion* x, Leap::Frame frame)
         SETSYMBOL (&gestureInfo[1], gensym ("id"));
         SETFLOAT (&gestureInfo[2], gesture.id());
 
-        outlet_list (x->x_outletGesture, 0, numGestureInfoAtoms, &gestureInfo[0]);
+        outlet_list (x->x_outletGesture, 0, numGestureInfoAtoms, gestureInfo);
 
         //state
         SETFLOAT (&gestureInfo[0], gestureIdx);
@@ -874,14 +872,14 @@ static void leapmotionProcessGestures (t_leapmotion* x, Leap::Frame frame)
                 break;
         }
 
-        outlet_list (x->x_outletGesture, 0, numGestureInfoAtoms, &gestureInfo[0]);
+        outlet_list (x->x_outletGesture, 0, numGestureInfoAtoms, gestureInfo);
 
         // duration
         SETFLOAT (&gestureInfo[0], gestureIdx);
         SETSYMBOL (&gestureInfo[1], gensym ("duration"));
         SETFLOAT (&gestureInfo[2], gesture.duration());
 
-        outlet_list (x->x_outletGesture, 0, numGestureInfoAtoms, &gestureInfo[0]);
+        outlet_list (x->x_outletGesture, 0, numGestureInfoAtoms, gestureInfo);
 
         // additional gesture-specific data
         SETFLOAT (&gestureData[0], gestureIdx);
@@ -899,15 +897,15 @@ static void leapmotionProcessGestures (t_leapmotion* x, Leap::Frame frame)
                 SETFLOAT (&gestureData[4], circleGesture.center().x);
                 SETFLOAT (&gestureData[5], circleGesture.center().y);
                 SETFLOAT (&gestureData[6], circleGesture.center().z);
-                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, &gestureData[0]);
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, gestureData);
 
                 SETSYMBOL (&gestureData[3], gensym ("radius"));
                 SETFLOAT (&gestureData[4], circleGesture.radius());
-                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms - 2, &gestureData[0]);
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms - 2, gestureData);
 
                 SETSYMBOL (&gestureData[3], gensym ("progress"));
                 SETFLOAT (&gestureData[4], circleGesture.progress());
-                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms - 2, &gestureData[0]);
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms - 2, gestureData);
                 break;
 
             case Leap::Gesture::TYPE_SWIPE:
@@ -917,23 +915,23 @@ static void leapmotionProcessGestures (t_leapmotion* x, Leap::Frame frame)
                 SETFLOAT (&gestureData[4], swipeGesture.startPosition().x);
                 SETFLOAT (&gestureData[5], swipeGesture.startPosition().y);
                 SETFLOAT (&gestureData[6], swipeGesture.startPosition().z);
-                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, &gestureData[0]);
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, gestureData);
 
                 SETSYMBOL (&gestureData[3], gensym ("direction"));
                 SETFLOAT (&gestureData[4], swipeGesture.direction().x);
                 SETFLOAT (&gestureData[5], swipeGesture.direction().y);
                 SETFLOAT (&gestureData[6], swipeGesture.direction().z);
-                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, &gestureData[0]);
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, gestureData);
 
                 SETSYMBOL (&gestureData[3], gensym ("speed"));
                 SETFLOAT (&gestureData[4], swipeGesture.speed());
-                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms - 2, &gestureData[0]);
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms - 2, gestureData);
 
                 SETSYMBOL (&gestureData[3], gensym ("position"));
                 SETFLOAT (&gestureData[4], swipeGesture.position().x);
                 SETFLOAT (&gestureData[5], swipeGesture.position().y);
                 SETFLOAT (&gestureData[6], swipeGesture.position().z);
-                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, &gestureData[0]);
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, gestureData);
                 break;
 
             case Leap::Gesture::TYPE_KEY_TAP:
@@ -943,17 +941,17 @@ static void leapmotionProcessGestures (t_leapmotion* x, Leap::Frame frame)
                 SETFLOAT (&gestureData[4], keyTapGesture.direction().x);
                 SETFLOAT (&gestureData[5], keyTapGesture.direction().y);
                 SETFLOAT (&gestureData[6], keyTapGesture.direction().z);
-                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, &gestureData[0]);
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, gestureData);
 
                 SETSYMBOL (&gestureData[3], gensym ("position"));
                 SETFLOAT (&gestureData[4], keyTapGesture.position().x);
                 SETFLOAT (&gestureData[5], keyTapGesture.position().y);
                 SETFLOAT (&gestureData[6], keyTapGesture.position().z);
-                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, &gestureData[0]);
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, gestureData);
 
                 SETSYMBOL (&gestureData[3], gensym ("progress"));
                 SETFLOAT (&gestureData[4], keyTapGesture.progress());
-                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms - 2, &gestureData[0]);
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms - 2, gestureData);
                 break;
 
             case Leap::Gesture::TYPE_SCREEN_TAP:
@@ -963,17 +961,17 @@ static void leapmotionProcessGestures (t_leapmotion* x, Leap::Frame frame)
                 SETFLOAT (&gestureData[4], screenTapGesture.direction().x);
                 SETFLOAT (&gestureData[5], screenTapGesture.direction().y);
                 SETFLOAT (&gestureData[6], screenTapGesture.direction().z);
-                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, &gestureData[0]);
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, gestureData);
 
                 SETSYMBOL (&gestureData[3], gensym ("position"));
                 SETFLOAT (&gestureData[4], screenTapGesture.position().x);
                 SETFLOAT (&gestureData[5], screenTapGesture.position().y);
                 SETFLOAT (&gestureData[6], screenTapGesture.position().z);
-                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, &gestureData[0]);
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, gestureData);
 
                 SETSYMBOL (&gestureData[3], gensym ("progress"));
                 SETFLOAT (&gestureData[4], screenTapGesture.progress());
-                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms - 2, &gestureData[0]);
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms - 2, gestureData);
                 break;
         }
     }
@@ -1435,5 +1433,5 @@ static void leapmotionProcessGeneral (t_leapmotion* x, Leap::Frame frame)
     SETFLOAT (&generalInfo[4], (t_float) frame.tools().count());
     SETFLOAT (&generalInfo[5], (t_float) frame.gestures().count());
 
-    outlet_list (x->x_outletGeneral, 0, numGeneralInfoAtoms, &generalInfo[0]);
+    outlet_list (x->x_outletGeneral, 0, numGeneralInfoAtoms, generalInfo);
 }

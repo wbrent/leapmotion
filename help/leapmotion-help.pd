@@ -31,14 +31,12 @@
 #N canvas 939 270 671 746 gesture-data 0;
 #N canvas 855 104 681 686 gesture 0;
 #X obj 30 140 gesture 0;
-#X obj 30 56 route count;
+#X obj 30 46 route count;
 #X floatatom 30 110 5 0 0 1 count - - 0;
 #X obj 30 15 r gesture;
-#X obj 30 36 list trim;
 #X obj 30 370 gesture 1;
 #X connect 1 0 2 0;
-#X connect 3 0 4 0;
-#X connect 4 0 1 0;
+#X connect 3 0 1 0;
 #X coords 0 -1 1 1 610 520 1 20 80;
 #X restore 23 29 pd gesture;
 #X text 87 609 for more information on gestures \, see:;
