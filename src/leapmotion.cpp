@@ -825,84 +825,157 @@ static void leapmotionProcessGestures (t_leapmotion* x, Leap::Frame frame)
     if (x->x_gestureCountFlag)
     {
         int numGestureCountAtoms = 2;
-        t_atom gestureCountInfo[numGestureCountAtoms];
+        t_atom gestureCount[numGestureCountAtoms];
 
-        SETSYMBOL (&gestureCountInfo[0], gensym ("count"));
-        SETFLOAT (&gestureCountInfo[1], (t_float) numGesturesPerFrame);
-        outlet_list(x->x_outletGesture, 0, numGestureCountAtoms, &gestureCountInfo[0]);
+        SETSYMBOL (&gestureCount[0], gensym ("count"));
+        SETFLOAT (&gestureCount[1], (t_float) numGesturesPerFrame);
+        outlet_list (x->x_outletGesture, 0, numGestureCountAtoms, &gestureCount[0]);
     }
 
     for (int gestureIdx = 0; gestureIdx < numGesturesPerFrame; gestureIdx++)
     {
         Leap::Gesture gesture = gestureList[gestureIdx];
+        // cast the gesture to specific types for data output below
+        Leap::CircleGesture circleGesture = gesture;
+        Leap::SwipeGesture swipeGesture = gesture;
+        Leap::KeyTapGesture keyTapGesture = gesture;
+        Leap::ScreenTapGesture screenTapGesture = gesture;
 
         int numGestureInfoAtoms = 3;
-        t_atom gestureIdInfo[numGestureInfoAtoms];
-        t_atom gestureTypeInfo[numGestureInfoAtoms];
-        t_atom gestureStateInfo[numGestureInfoAtoms];
-        t_atom gestureDurationInfo[numGestureInfoAtoms];
+        t_atom gestureInfo[numGestureInfoAtoms];
+
+        int numGestureDataAtoms = 7;
+        t_atom gestureData[numGestureDataAtoms];
 
         // id
-        // output this first for parsing
-        SETFLOAT (&gestureIdInfo[0], gestureIdx);
-        SETSYMBOL (&gestureIdInfo[1], gensym ("id"));
-        SETFLOAT (&gestureIdInfo[2], gesture.id());
+        SETFLOAT (&gestureInfo[0], gestureIdx);
+        SETSYMBOL (&gestureInfo[1], gensym ("id"));
+        SETFLOAT (&gestureInfo[2], gesture.id());
 
-        outlet_list(x->x_outletGesture, 0, numGestureInfoAtoms, &gestureIdInfo[0]);
-
-        // type
-        SETFLOAT (&gestureTypeInfo[0], gestureIdx);
-        SETSYMBOL (&gestureTypeInfo[1], gensym ("type"));
-
-        switch (gesture.type())
-        {
-            case Leap::Gesture::TYPE_INVALID:
-                SETSYMBOL (&gestureTypeInfo[2], gensym ("TYPE_INVALID"));
-                break;
-            case Leap::Gesture::TYPE_SWIPE:
-                SETSYMBOL (&gestureTypeInfo[2], gensym ("TYPE_SWIPE"));
-                break;
-            case Leap::Gesture::TYPE_CIRCLE:
-                SETSYMBOL (&gestureTypeInfo[2], gensym ("TYPE_CIRCLE"));
-                break;
-            case Leap::Gesture::TYPE_SCREEN_TAP:
-                SETSYMBOL (&gestureTypeInfo[2], gensym ("TYPE_SCREEN_TAP"));
-                break;
-            case Leap::Gesture::TYPE_KEY_TAP:
-                SETSYMBOL (&gestureTypeInfo[2], gensym ("TYPE_KEY_TAP"));
-                break;
-        }
-
-        outlet_list(x->x_outletGesture, 0, numGestureInfoAtoms, &gestureTypeInfo[0]);
+        outlet_list (x->x_outletGesture, 0, numGestureInfoAtoms, &gestureInfo[0]);
 
         //state
-        SETFLOAT (&gestureStateInfo[0], gestureIdx);
-        SETSYMBOL (&gestureStateInfo[1], gensym ("state"));
+        SETFLOAT (&gestureInfo[0], gestureIdx);
+        SETSYMBOL (&gestureInfo[1], gensym ("state"));
 
         switch(gesture.state())
         {
             case Leap::Gesture::STATE_INVALID:
-                SETSYMBOL (&gestureStateInfo[2], gensym ("STATE_INVALID"));
+                SETSYMBOL (&gestureInfo[2], gensym ("invalid"));
                 break;
             case Leap::Gesture::STATE_START:
-                SETSYMBOL (&gestureStateInfo[2], gensym ("TYPE_START"));
+                SETSYMBOL (&gestureInfo[2], gensym ("start"));
                 break;
             case Leap::Gesture::STATE_UPDATE:
-                SETSYMBOL (&gestureStateInfo[2], gensym ("STATE_UPDATE"));
+                SETSYMBOL (&gestureInfo[2], gensym ("update"));
                 break;
             case Leap::Gesture::STATE_STOP:
-                SETSYMBOL (&gestureStateInfo[2], gensym ("TYPE_STOP"));
+                SETSYMBOL (&gestureInfo[2], gensym ("stop"));
                 break;
         }
 
-        outlet_list(x->x_outletGesture, 0, numGestureInfoAtoms, &gestureStateInfo[0]);
+        outlet_list (x->x_outletGesture, 0, numGestureInfoAtoms, &gestureInfo[0]);
 
         // duration
-        SETFLOAT (&gestureDurationInfo[0], gestureIdx);
-        SETSYMBOL (&gestureDurationInfo[1], gensym ("duration"));
-        SETFLOAT (&gestureDurationInfo[2], gesture.duration());
+        SETFLOAT (&gestureInfo[0], gestureIdx);
+        SETSYMBOL (&gestureInfo[1], gensym ("duration"));
+        SETFLOAT (&gestureInfo[2], gesture.duration());
 
-        outlet_list(x->x_outletGesture, 0, numGestureInfoAtoms, &gestureDurationInfo[0]);
+        outlet_list (x->x_outletGesture, 0, numGestureInfoAtoms, &gestureInfo[0]);
+
+        // additional gesture-specific data
+        SETFLOAT (&gestureData[0], gestureIdx);
+        SETSYMBOL (&gestureData[1], gensym ("data"));
+
+        switch (gesture.type())
+        {
+            case Leap::Gesture::TYPE_INVALID:
+                break;
+
+            case Leap::Gesture::TYPE_CIRCLE:
+                SETSYMBOL (&gestureData[2], gensym ("circle"));
+
+                SETSYMBOL (&gestureData[3], gensym ("center"));
+                SETFLOAT (&gestureData[4], circleGesture.center().x);
+                SETFLOAT (&gestureData[5], circleGesture.center().y);
+                SETFLOAT (&gestureData[6], circleGesture.center().z);
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, &gestureData[0]);
+
+                SETSYMBOL (&gestureData[3], gensym ("radius"));
+                SETFLOAT (&gestureData[4], circleGesture.radius());
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms - 2, &gestureData[0]);
+
+                SETSYMBOL (&gestureData[3], gensym ("progress"));
+                SETFLOAT (&gestureData[4], circleGesture.progress());
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms - 2, &gestureData[0]);
+                break;
+
+            case Leap::Gesture::TYPE_SWIPE:
+                SETSYMBOL (&gestureData[2], gensym ("swipe"));
+
+                SETSYMBOL (&gestureData[3], gensym ("start_position"));
+                SETFLOAT (&gestureData[4], swipeGesture.startPosition().x);
+                SETFLOAT (&gestureData[5], swipeGesture.startPosition().y);
+                SETFLOAT (&gestureData[6], swipeGesture.startPosition().z);
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, &gestureData[0]);
+
+                SETSYMBOL (&gestureData[3], gensym ("direction"));
+                SETFLOAT (&gestureData[4], swipeGesture.direction().x);
+                SETFLOAT (&gestureData[5], swipeGesture.direction().y);
+                SETFLOAT (&gestureData[6], swipeGesture.direction().z);
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, &gestureData[0]);
+
+                SETSYMBOL (&gestureData[3], gensym ("speed"));
+                SETFLOAT (&gestureData[4], swipeGesture.speed());
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms - 2, &gestureData[0]);
+
+                SETSYMBOL (&gestureData[3], gensym ("position"));
+                SETFLOAT (&gestureData[4], swipeGesture.position().x);
+                SETFLOAT (&gestureData[5], swipeGesture.position().y);
+                SETFLOAT (&gestureData[6], swipeGesture.position().z);
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, &gestureData[0]);
+                break;
+
+            case Leap::Gesture::TYPE_KEY_TAP:
+                SETSYMBOL (&gestureData[2], gensym ("key_tap"));
+
+                SETSYMBOL (&gestureData[3], gensym ("direction"));
+                SETFLOAT (&gestureData[4], keyTapGesture.direction().x);
+                SETFLOAT (&gestureData[5], keyTapGesture.direction().y);
+                SETFLOAT (&gestureData[6], keyTapGesture.direction().z);
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, &gestureData[0]);
+
+                SETSYMBOL (&gestureData[3], gensym ("position"));
+                SETFLOAT (&gestureData[4], keyTapGesture.position().x);
+                SETFLOAT (&gestureData[5], keyTapGesture.position().y);
+                SETFLOAT (&gestureData[6], keyTapGesture.position().z);
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, &gestureData[0]);
+
+                SETSYMBOL (&gestureData[3], gensym ("progress"));
+                SETFLOAT (&gestureData[4], keyTapGesture.progress());
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms - 2, &gestureData[0]);
+                break;
+
+            case Leap::Gesture::TYPE_SCREEN_TAP:
+                SETSYMBOL (&gestureData[2], gensym ("screen_tap"));
+
+                SETSYMBOL (&gestureData[3], gensym ("direction"));
+                SETFLOAT (&gestureData[4], screenTapGesture.direction().x);
+                SETFLOAT (&gestureData[5], screenTapGesture.direction().y);
+                SETFLOAT (&gestureData[6], screenTapGesture.direction().z);
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, &gestureData[0]);
+
+                SETSYMBOL (&gestureData[3], gensym ("position"));
+                SETFLOAT (&gestureData[4], screenTapGesture.position().x);
+                SETFLOAT (&gestureData[5], screenTapGesture.position().y);
+                SETFLOAT (&gestureData[6], screenTapGesture.position().z);
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, &gestureData[0]);
+
+                SETSYMBOL (&gestureData[3], gensym ("progress"));
+                SETFLOAT (&gestureData[4], screenTapGesture.progress());
+                outlet_list (x->x_outletGesture, 0, numGestureDataAtoms - 2, &gestureData[0]);
+                break;
+        }
     }
 }
 
@@ -1362,5 +1435,5 @@ static void leapmotionProcessGeneral (t_leapmotion* x, Leap::Frame frame)
     SETFLOAT (&generalInfo[4], (t_float) frame.tools().count());
     SETFLOAT (&generalInfo[5], (t_float) frame.gestures().count());
 
-    outlet_list(x->x_outletGeneral, 0, numGeneralInfoAtoms, &generalInfo[0]);
+    outlet_list (x->x_outletGeneral, 0, numGeneralInfoAtoms, &generalInfo[0]);
 }
