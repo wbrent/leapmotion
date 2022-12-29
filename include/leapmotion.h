@@ -19,6 +19,7 @@ typedef struct _leapmotion
     t_symbol* x_objSymbol;
     LeapMotionObj* x_leapMotionObjPtr;
 
+    uint8_t x_iBoxNormalize;
     uint8_t x_gestureCountFlag;
 
     uint8_t x_handsArmCenterFlag;
@@ -71,6 +72,9 @@ extern "C" {void leapmotion_setup (void);}
 // set methods: general
 static void leapmotionSetGeneralFlag (t_leapmotion* x, t_float state);
 
+// set methods: interaction box normalization
+static void leapmotionSetInteractionBoxNormalize (t_leapmotion* x, t_float state);
+
 // set methods: hands
 static void leapmotionSetHandsArmCenterFlag (t_leapmotion* x, t_float state);
 static void leapmotionSetHandsArmDirectionFlag (t_leapmotion* x, t_float state);
@@ -119,9 +123,9 @@ static void leapmotionPoll (t_leapmotion* x);
 
 // sub-routinese to extract data from a Leap::Frame
 static void leapmotionProcessGestures (t_leapmotion* x, Leap::Frame frame);
-static void leapmotionProcessArm (t_leapmotion* x, int handIdx, Leap::Hand hand);
+static void leapmotionProcessArm (t_leapmotion* x, int handIdx, Leap::Hand hand, Leap::InteractionBox interactionBox);
 static void leapmotionProcessHands (t_leapmotion* x, Leap::Frame frame);
-static void leapmotionProcessFingers (t_leapmotion* x, int handIdx, Leap::FingerList fingerList);
+static void leapmotionProcessFingers (t_leapmotion* x, int handIdx, Leap::FingerList fingerList, Leap::InteractionBox interactionBox);
 static void leapmotionProcessTools (t_leapmotion* x, Leap::Frame frame);
 static void leapmotionProcessGeneral (t_leapmotion* x, Leap::Frame frame);
 

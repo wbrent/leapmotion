@@ -4,10 +4,10 @@
 #X floatatom 195 534 5 0 0 0 tools - - 0;
 #X floatatom 195 437 5 0 0 0 sphere_radius - - 0;
 #X obj 648 24 r hand;
-#X text 238 192 direction;
-#X text 244 244 position;
-#X text 244 297 velocity;
-#X text 268 350 size;
+#X text 238 222 direction;
+#X text 244 274 position;
+#X text 244 327 velocity;
+#X text 268 380 size;
 #X obj 195 31 unpack f f f;
 #X obj 495 31 unpack f f f;
 #X obj 112 186 cnv 16 115 50 empty empty empty 20 12 0 10 #e0e0e0 #404040 0;

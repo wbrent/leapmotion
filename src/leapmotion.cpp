@@ -14,6 +14,8 @@ static void* leapmotion_new (t_symbol* s)
     // create the LeapMotionObj instance and store a pointer to it
     x->x_leapMotionObjPtr = new LeapMotionObj;
 
+    x->x_iBoxNormalize = 0;
+
     x->x_gestureCountFlag = 0;
 
     x->x_handsArmCenterFlag = 0;
@@ -97,6 +99,15 @@ void leapmotion_setup (void)
 
 
     // set methods
+    // interaction box normalization
+    class_addmethod (
+        leapmotion_class,
+        (t_method) leapmotionSetInteractionBoxNormalize,
+        gensym ("ibox_normalize"),
+        A_DEFFLOAT,
+        A_NULL
+    );
+
     // general
     class_addmethod (
         leapmotion_class,
@@ -383,6 +394,14 @@ static void leapmotionSetGeneralFlag (t_leapmotion* x, t_float state)
     x->x_generalFlag = state;
 }
 
+// set methods: interaction box normalization
+void leapmotionSetInteractionBoxNormalize (t_leapmotion* x, t_float state)
+{
+    state = (state < 0.0) ? 0.0 : state;
+    state = (state > 1.0) ? 1.0 : state;
+
+    x->x_iBoxNormalize = state;
+}
 
 // set methods: hands
 static void leapmotionSetHandsArmCenterFlag (t_leapmotion* x, t_float state)
@@ -735,8 +754,9 @@ static void leapmotionInfo (t_leapmotion* x)
     for (int d = 0; d < numDevices; d++)
         post ("Leap Motion %s", deviceList[d].toString().c_str());
 
-    post ("\n**** InteractionBox center & dimensions:");
-    post ("%s", interactionBox.toString().c_str());
+    post ("\n**** Interaction box:");
+    post ("Center & dimensions of %s", interactionBox.toString().c_str());
+    post ("ibox_normalize: %i\n", x->x_iBoxNormalize);
 
     post ("\n**** Flag states:");
     post ("general: %i\n", x->x_generalFlag);
@@ -833,6 +853,7 @@ static void leapmotionProcessGestures (t_leapmotion* x, Leap::Frame frame)
 {
     Leap::GestureList gestureList = frame.gestures();
     int numGesturesPerFrame = gestureList.count();
+    Leap::InteractionBox interactionBox = frame.interactionBox();
 
     if (x->x_gestureCountFlag)
     {
@@ -850,6 +871,7 @@ static void leapmotionProcessGestures (t_leapmotion* x, Leap::Frame frame)
         Leap::SwipeGesture swipeGesture = gesture;
         Leap::KeyTapGesture keyTapGesture = gesture;
         Leap::ScreenTapGesture screenTapGesture = gesture;
+        Leap::Vector point;
 
         int numGestureInfoAtoms = 3;
         t_atom gestureInfo[numGestureInfoAtoms];
@@ -905,10 +927,15 @@ static void leapmotionProcessGestures (t_leapmotion* x, Leap::Frame frame)
             case Leap::Gesture::TYPE_CIRCLE:
                 SETSYMBOL (&gestureData[2], gensym ("circle"));
 
+                if (x->x_iBoxNormalize)
+                    point = interactionBox.normalizePoint(circleGesture.center(), false);
+                else
+                    point = circleGesture.center();
+
                 SETSYMBOL (&gestureData[3], gensym ("center"));
-                SETFLOAT (&gestureData[4], circleGesture.center().x);
-                SETFLOAT (&gestureData[5], circleGesture.center().y);
-                SETFLOAT (&gestureData[6], circleGesture.center().z);
+                SETFLOAT (&gestureData[4], point.x);
+                SETFLOAT (&gestureData[5], point.y);
+                SETFLOAT (&gestureData[6], point.z);
                 outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, gestureData);
 
                 SETSYMBOL (&gestureData[3], gensym ("radius"));
@@ -923,10 +950,15 @@ static void leapmotionProcessGestures (t_leapmotion* x, Leap::Frame frame)
             case Leap::Gesture::TYPE_SWIPE:
                 SETSYMBOL (&gestureData[2], gensym ("swipe"));
 
+                if (x->x_iBoxNormalize)
+                    point = interactionBox.normalizePoint(swipeGesture.startPosition(), false);
+                else
+                    point = swipeGesture.startPosition();
+
                 SETSYMBOL (&gestureData[3], gensym ("start_position"));
-                SETFLOAT (&gestureData[4], swipeGesture.startPosition().x);
-                SETFLOAT (&gestureData[5], swipeGesture.startPosition().y);
-                SETFLOAT (&gestureData[6], swipeGesture.startPosition().z);
+                SETFLOAT (&gestureData[4], point.x);
+                SETFLOAT (&gestureData[5], point.y);
+                SETFLOAT (&gestureData[6], point.z);
                 outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, gestureData);
 
                 SETSYMBOL (&gestureData[3], gensym ("direction"));
@@ -939,10 +971,15 @@ static void leapmotionProcessGestures (t_leapmotion* x, Leap::Frame frame)
                 SETFLOAT (&gestureData[4], swipeGesture.speed());
                 outlet_list (x->x_outletGesture, 0, numGestureDataAtoms - 2, gestureData);
 
+                if (x->x_iBoxNormalize)
+                    point = interactionBox.normalizePoint(swipeGesture.position(), false);
+                else
+                    point = swipeGesture.position();
+
                 SETSYMBOL (&gestureData[3], gensym ("position"));
-                SETFLOAT (&gestureData[4], swipeGesture.position().x);
-                SETFLOAT (&gestureData[5], swipeGesture.position().y);
-                SETFLOAT (&gestureData[6], swipeGesture.position().z);
+                SETFLOAT (&gestureData[4], point.x);
+                SETFLOAT (&gestureData[5], point.y);
+                SETFLOAT (&gestureData[6], point.z);
                 outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, gestureData);
                 break;
 
@@ -955,10 +992,15 @@ static void leapmotionProcessGestures (t_leapmotion* x, Leap::Frame frame)
                 SETFLOAT (&gestureData[6], keyTapGesture.direction().z);
                 outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, gestureData);
 
+                if (x->x_iBoxNormalize)
+                    point = interactionBox.normalizePoint(keyTapGesture.position(), false);
+                else
+                    point = keyTapGesture.position();
+
                 SETSYMBOL (&gestureData[3], gensym ("position"));
-                SETFLOAT (&gestureData[4], keyTapGesture.position().x);
-                SETFLOAT (&gestureData[5], keyTapGesture.position().y);
-                SETFLOAT (&gestureData[6], keyTapGesture.position().z);
+                SETFLOAT (&gestureData[4], point.x);
+                SETFLOAT (&gestureData[5], point.y);
+                SETFLOAT (&gestureData[6], point.z);
                 outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, gestureData);
 
                 SETSYMBOL (&gestureData[3], gensym ("progress"));
@@ -975,10 +1017,15 @@ static void leapmotionProcessGestures (t_leapmotion* x, Leap::Frame frame)
                 SETFLOAT (&gestureData[6], screenTapGesture.direction().z);
                 outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, gestureData);
 
+                if (x->x_iBoxNormalize)
+                    point = interactionBox.normalizePoint(screenTapGesture.position(), false);
+                else
+                    point = screenTapGesture.position();
+
                 SETSYMBOL (&gestureData[3], gensym ("position"));
-                SETFLOAT (&gestureData[4], screenTapGesture.position().x);
-                SETFLOAT (&gestureData[5], screenTapGesture.position().y);
-                SETFLOAT (&gestureData[6], screenTapGesture.position().z);
+                SETFLOAT (&gestureData[4], point.x);
+                SETFLOAT (&gestureData[5], point.y);
+                SETFLOAT (&gestureData[6], point.z);
                 outlet_list (x->x_outletGesture, 0, numGestureDataAtoms, gestureData);
 
                 SETSYMBOL (&gestureData[3], gensym ("progress"));
@@ -993,6 +1040,7 @@ static void leapmotionProcessGestures (t_leapmotion* x, Leap::Frame frame)
 static void leapmotionProcessHands (t_leapmotion* x, Leap::Frame frame)
 {
     Leap::HandList handList = frame.hands();
+    Leap::InteractionBox interactionBox = frame.interactionBox();
 
     for (int handIdx = 0; handIdx < handList.count(); handIdx++)
     {
@@ -1003,6 +1051,7 @@ static void leapmotionProcessHands (t_leapmotion* x, Leap::Frame frame)
         Leap::Hand hand = handList[handIdx];
         Leap::FingerList fingerList = hand.fingers();
         Leap::ToolList toolList = hand.tools();
+        Leap::Vector point;
 
         // from LeapSDK/docs/cpp/devguide/Leap_Pointables.html: "As of version 2.0 of the Leap Motion SDK, all five fingers are are always present in the list of fingers for a hand."
         // therefore, Leap::FingerList.count() will not work as it did in the previous SDK. can use Leap::Finger.isExtended() to determine which ones are actually out.
@@ -1010,7 +1059,7 @@ static void leapmotionProcessHands (t_leapmotion* x, Leap::Frame frame)
         numToolsPerHand = toolList.count();
 
         // process arm per hand
-        leapmotionProcessArm (x, handIdx, hand);
+        leapmotionProcessArm (x, handIdx, hand, interactionBox);
 
         if (x->x_handsTypeFlag)
         {
@@ -1045,13 +1094,18 @@ static void leapmotionProcessHands (t_leapmotion* x, Leap::Frame frame)
         // sphere center
         if (x->x_handsSphereCenterFlag)
         {
+            if (x->x_iBoxNormalize)
+                point = interactionBox.normalizePoint(hand.sphereCenter(), false);
+            else
+                point = hand.sphereCenter();
+
             // sphere center
             SETFLOAT (&handInfo[0], handIdx);
             SETSYMBOL (&handInfo[1], gensym ("sphere"));
             SETSYMBOL (&handInfo[2], gensym ("center"));
-            SETFLOAT (&handInfo[3], hand.sphereCenter().x);
-            SETFLOAT (&handInfo[4], hand.sphereCenter().y);
-            SETFLOAT (&handInfo[5], hand.sphereCenter().z);
+            SETFLOAT (&handInfo[3], point.x);
+            SETFLOAT (&handInfo[4], point.y);
+            SETFLOAT (&handInfo[5], point.z);
 
             outlet_anything (x->x_outletHandsFingersTools, gensym ("hand"), numHandInfoAtoms, handInfo);
         }
@@ -1084,18 +1138,17 @@ static void leapmotionProcessHands (t_leapmotion* x, Leap::Frame frame)
         // palm position
         if (x->x_handsPalmPositionFlag)
         {
-            // Leap::InteractionBox interactionBox = frame.interactionBox();
-            // TODO: need a global switch for normalizing points or not, and a global switch for clamping or not
-            // Leap::Vector point = interactionBox.normalizePoint(hand.palmPosition(), false);
-
-            // post ("%s", interactionBox.toString().c_str());
+            if (x->x_iBoxNormalize)
+                point = interactionBox.normalizePoint(hand.palmPosition(), false);
+            else
+                point = hand.palmPosition();
 
             SETFLOAT (&handInfo[0], handIdx);
             SETSYMBOL (&handInfo[1], gensym ("palm"));
             SETSYMBOL (&handInfo[2], gensym ("position"));
-            SETFLOAT (&handInfo[3], hand.palmPosition().x);
-            SETFLOAT (&handInfo[4], hand.palmPosition().y);
-            SETFLOAT (&handInfo[5], hand.palmPosition().z);
+            SETFLOAT (&handInfo[3], point.x);
+            SETFLOAT (&handInfo[4], point.y);
+            SETFLOAT (&handInfo[5], point.z);
 
             outlet_anything (x->x_outletHandsFingersTools, gensym ("hand"), numHandInfoAtoms, handInfo);
         }
@@ -1103,12 +1156,17 @@ static void leapmotionProcessHands (t_leapmotion* x, Leap::Frame frame)
         // stabilized palm position
         if (x->x_handsStabilizedPalmPositionFlag)
         {
+            if (x->x_iBoxNormalize)
+                point = interactionBox.normalizePoint(hand.stabilizedPalmPosition(), false);
+            else
+                point = hand.stabilizedPalmPosition();
+
             SETFLOAT (&handInfo[0], handIdx);
             SETSYMBOL (&handInfo[1], gensym ("palm"));
             SETSYMBOL (&handInfo[2], gensym ("stabilized_position"));
-            SETFLOAT (&handInfo[3], hand.stabilizedPalmPosition().x);
-            SETFLOAT (&handInfo[4], hand.stabilizedPalmPosition().y);
-            SETFLOAT (&handInfo[5], hand.stabilizedPalmPosition().z);
+            SETFLOAT (&handInfo[3], point.x);
+            SETFLOAT (&handInfo[4], point.y);
+            SETFLOAT (&handInfo[5], point.z);
 
             outlet_anything (x->x_outletHandsFingersTools, gensym ("hand"), numHandInfoAtoms, handInfo);
         }
@@ -1197,26 +1255,32 @@ static void leapmotionProcessHands (t_leapmotion* x, Leap::Frame frame)
 
         // process fingers per hand
         if (numFingersPerHand)
-            leapmotionProcessFingers (x, handIdx, fingerList);
+            leapmotionProcessFingers (x, handIdx, fingerList, interactionBox);
     }
 }
 
 // process arm data
-static void leapmotionProcessArm (t_leapmotion* x, int handIdx, Leap::Hand hand)
+static void leapmotionProcessArm (t_leapmotion* x, int handIdx, Leap::Hand hand, Leap::InteractionBox interactionBox)
 {
     Leap::Arm arm = hand.arm();
     int numArmInfoAtoms = 6;
     t_atom armInfo[numArmInfoAtoms];
+    Leap::Vector point;
 
     // center
     if (x->x_handsArmCenterFlag)
     {
+        if (x->x_iBoxNormalize)
+            point = interactionBox.normalizePoint(arm.center(), false);
+        else
+            point = arm.center();
+
         SETFLOAT (&armInfo[0], (t_float) handIdx);
         SETSYMBOL (&armInfo[1], gensym ("arm"));
         SETSYMBOL (&armInfo[2], gensym ("center"));
-        SETFLOAT (&armInfo[3], (t_float) arm.center().x);
-        SETFLOAT (&armInfo[4], (t_float) arm.center().y);
-        SETFLOAT (&armInfo[5], (t_float) arm.center().z);
+        SETFLOAT (&armInfo[3], point.x);
+        SETFLOAT (&armInfo[4], point.y);
+        SETFLOAT (&armInfo[5], point.z);
 
         outlet_anything (x->x_outletHandsFingersTools, gensym ("hand"), numArmInfoAtoms, armInfo);
     }
@@ -1227,9 +1291,9 @@ static void leapmotionProcessArm (t_leapmotion* x, int handIdx, Leap::Hand hand)
         SETFLOAT (&armInfo[0], (t_float) handIdx);
         SETSYMBOL (&armInfo[1], gensym ("arm"));
         SETSYMBOL (&armInfo[2], gensym ("direction"));
-        SETFLOAT (&armInfo[3], (t_float) arm.direction().x);
-        SETFLOAT (&armInfo[4], (t_float) arm.direction().y);
-        SETFLOAT (&armInfo[5], (t_float) arm.direction().z);
+        SETFLOAT (&armInfo[3], arm.direction().x);
+        SETFLOAT (&armInfo[4], arm.direction().y);
+        SETFLOAT (&armInfo[5], arm.direction().z);
 
         outlet_anything (x->x_outletHandsFingersTools, gensym ("hand"), numArmInfoAtoms, armInfo);
     }
@@ -1237,12 +1301,17 @@ static void leapmotionProcessArm (t_leapmotion* x, int handIdx, Leap::Hand hand)
     // elbow_position
     if (x->x_handsArmElbowPositionFlag)
     {
+        if (x->x_iBoxNormalize)
+            point = interactionBox.normalizePoint(arm.elbowPosition(), false);
+        else
+            point = arm.elbowPosition();
+
         SETFLOAT (&armInfo[0], (t_float) handIdx);
         SETSYMBOL (&armInfo[1], gensym ("arm"));
         SETSYMBOL (&armInfo[2], gensym ("elbow_position"));
-        SETFLOAT (&armInfo[3], (t_float) arm.elbowPosition().x);
-        SETFLOAT (&armInfo[4], (t_float) arm.elbowPosition().y);
-        SETFLOAT (&armInfo[5], (t_float) arm.elbowPosition().z);
+        SETFLOAT (&armInfo[3], point.x);
+        SETFLOAT (&armInfo[4], point.y);
+        SETFLOAT (&armInfo[5], point.z);
 
         outlet_anything (x->x_outletHandsFingersTools, gensym ("hand"), numArmInfoAtoms, armInfo);
     }
@@ -1250,12 +1319,17 @@ static void leapmotionProcessArm (t_leapmotion* x, int handIdx, Leap::Hand hand)
     // wrist_position
     if (x->x_handsArmWristPositionFlag)
     {
+        if (x->x_iBoxNormalize)
+            point = interactionBox.normalizePoint(arm.wristPosition(), false);
+        else
+            point = arm.wristPosition();
+
         SETFLOAT (&armInfo[0], (t_float) handIdx);
         SETSYMBOL (&armInfo[1], gensym ("arm"));
         SETSYMBOL (&armInfo[2], gensym ("wrist_position"));
-        SETFLOAT (&armInfo[3], (t_float) arm.wristPosition().x);
-        SETFLOAT (&armInfo[4], (t_float) arm.wristPosition().y);
-        SETFLOAT (&armInfo[5], (t_float) arm.wristPosition().z);
+        SETFLOAT (&armInfo[3], point.x);
+        SETFLOAT (&armInfo[4], point.y);
+        SETFLOAT (&armInfo[5], point.z);
 
         outlet_anything (x->x_outletHandsFingersTools, gensym ("hand"), numArmInfoAtoms, armInfo);
     }
@@ -1273,13 +1347,14 @@ static void leapmotionProcessArm (t_leapmotion* x, int handIdx, Leap::Hand hand)
 }
 
 // process fingers
-static void leapmotionProcessFingers (t_leapmotion* x, int handIdx, Leap::FingerList fingerList)
+static void leapmotionProcessFingers (t_leapmotion* x, int handIdx, Leap::FingerList fingerList, Leap::InteractionBox interactionBox)
 {
     for (int fingerIdx = 0; fingerIdx < fingerList.count(); fingerIdx++)
     {
         Leap::Finger finger = fingerList[fingerIdx];
         int numFingerInfoAtoms = 7;
         t_atom fingerInfo[numFingerInfoAtoms];
+        Leap::Vector point;
 
         if (x->x_fingersTypeFlag)
         {
@@ -1330,13 +1405,18 @@ static void leapmotionProcessFingers (t_leapmotion* x, int handIdx, Leap::Finger
 
         if (x->x_fingersPositionFlag)
         {
+            if (x->x_iBoxNormalize)
+                point = interactionBox.normalizePoint(finger.tipPosition(), false);
+            else
+                point = finger.tipPosition();
+
             SETFLOAT (&fingerInfo[0], handIdx);
             SETSYMBOL (&fingerInfo[1], gensym ("finger"));
             SETFLOAT (&fingerInfo[2], fingerIdx);
             SETSYMBOL (&fingerInfo[3], gensym ("position"));
-            SETFLOAT (&fingerInfo[4], finger.tipPosition().x);
-            SETFLOAT (&fingerInfo[5], finger.tipPosition().y);
-            SETFLOAT (&fingerInfo[6], finger.tipPosition().z);
+            SETFLOAT (&fingerInfo[4], point.x);
+            SETFLOAT (&fingerInfo[5], point.y);
+            SETFLOAT (&fingerInfo[6], point.z);
 
             outlet_anything (x->x_outletHandsFingersTools, gensym ("hand"), numFingerInfoAtoms, fingerInfo);
         }
@@ -1383,12 +1463,14 @@ static void leapmotionProcessFingers (t_leapmotion* x, int handIdx, Leap::Finger
 static void leapmotionProcessTools (t_leapmotion* x, Leap::Frame frame)
 {
     Leap::ToolList toolList = frame.tools();
+    Leap::InteractionBox interactionBox = frame.interactionBox();
 
     // tools per frame
     for (int toolIdx = 0; toolIdx < toolList.count(); toolIdx++)
     {
         int numToolInfoAtoms = 5;
         t_atom toolInfo[numToolInfoAtoms];
+        Leap::Vector point;
 
         Leap::Tool tool = toolList[toolIdx];
 
@@ -1405,11 +1487,16 @@ static void leapmotionProcessTools (t_leapmotion* x, Leap::Frame frame)
 
         if (x->x_toolsPositionFlag)
         {
+            if (x->x_iBoxNormalize)
+                point = interactionBox.normalizePoint(tool.tipPosition(), false);
+            else
+                point = tool.tipPosition();
+
             SETFLOAT (&toolInfo[0], toolIdx);
             SETSYMBOL (&toolInfo[1], gensym ("position"));
-            SETFLOAT (&toolInfo[2], tool.tipPosition().x);
-            SETFLOAT (&toolInfo[3], tool.tipPosition().y);
-            SETFLOAT (&toolInfo[4], tool.tipPosition().z);
+            SETFLOAT (&toolInfo[2], point.x);
+            SETFLOAT (&toolInfo[3], point.y);
+            SETFLOAT (&toolInfo[4], point.z);
 
             outlet_anything (x->x_outletHandsFingersTools, gensym ("tool"), numToolInfoAtoms, toolInfo);
         }
