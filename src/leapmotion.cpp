@@ -13,6 +13,7 @@ static void* leapmotion_new (t_symbol* s)
 
     // create the LeapMotionObj instance and store a pointer to it
     x->x_leapMotionObjPtr = new LeapMotionObj;
+    x->x_timeStampReference = 0;
 
     x->x_iBoxNormalize = 0;
 
@@ -87,6 +88,13 @@ void leapmotion_setup (void)
         leapmotion_class,
         (t_method) leapmotionInfo,
         gensym ("info"),
+        A_NULL
+    );
+
+    class_addmethod (
+        leapmotion_class,
+        (t_method) leapmotionResetTimeStamp,
+        gensym ("timestamp_reset"),
         A_NULL
     );
 
@@ -814,6 +822,11 @@ static void leapmotionInfo (t_leapmotion* x)
     post ("Gesture.ScreenTap.MinDistance: %0.2f mm\n\n", x->x_leapMotionObjPtr->m_controller.config().getFloat("Gesture.ScreenTap.MinDistance"));
 }
 
+// reset the time stamp
+static void leapmotionResetTimeStamp (t_leapmotion* x)
+{
+    x->x_timeStampReference = x->x_leapMotionObjPtr->m_dispatcher.frame.timestamp();
+}
 
 // poll method
 static void leapmotionPoll (t_leapmotion* x)
@@ -911,7 +924,7 @@ static void leapmotionProcessGestures (t_leapmotion* x, Leap::Frame frame)
         // duration
         SETFLOAT (&gestureInfo[0], gestureIdx);
         SETSYMBOL (&gestureInfo[1], gensym ("duration"));
-        SETFLOAT (&gestureInfo[2], gesture.duration());
+        SETFLOAT (&gestureInfo[2], gesture.durationSeconds());
 
         outlet_list (x->x_outletGesture, 0, numGestureInfoAtoms, gestureInfo);
 
@@ -1532,7 +1545,8 @@ static void leapmotionProcessGeneral (t_leapmotion* x, Leap::Frame frame)
     t_atom generalInfo[numGeneralInfoAtoms];
 
     SETFLOAT (&generalInfo[0], (t_float) frame.id());
-    SETFLOAT (&generalInfo[1], (t_float) frame.timestamp());
+    // convert from microseconds to seconds
+    SETFLOAT (&generalInfo[1], (t_float) ((frame.timestamp() - x->x_timeStampReference) / (t_float)1000000.0));
     SETFLOAT (&generalInfo[2], (t_float) frame.currentFramesPerSecond());
     SETFLOAT (&generalInfo[3], (t_float) frame.hands().count());
     SETFLOAT (&generalInfo[4], (t_float) frame.tools().count());

@@ -18,6 +18,7 @@ typedef struct _leapmotion
     t_object x_obj;
     t_symbol* x_objSymbol;
     LeapMotionObj* x_leapMotionObjPtr;
+    int64_t x_timeStampReference;
 
     uint8_t x_iBoxNormalize;
     uint8_t x_gestureCountFlag;
@@ -117,6 +118,9 @@ static void leapmotionSetGestureConfig (t_leapmotion* x, t_symbol* key, t_float 
 
 // post object info
 static void leapmotionInfo (t_leapmotion* x);
+
+// reset the timestamp
+static void leapmotionResetTimeStamp (t_leapmotion* x);
 
 // poll LEAP device
 static void leapmotionPoll (t_leapmotion* x);
