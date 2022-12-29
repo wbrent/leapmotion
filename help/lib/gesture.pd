@@ -1,10 +1,10 @@
 #N canvas 155 85 1105 588 10;
-#X floatatom 146 416 8 0 0 0 dur: - - 0;
-#X floatatom 146 356 5 0 0 0 id: - - 0;
+#X floatatom 146 416 8 0 0 0 dur - - 0;
+#X floatatom 146 356 5 0 0 0 id - - 0;
 #X obj 302 199 symbol;
-#X symbolatom 146 376 10 0 0 0 type: - - 0;
+#X symbolatom 146 376 10 0 0 0 type - - 0;
 #X obj 242 113 symbol;
-#X symbolatom 146 396 10 0 0 0 state: - - 0;
+#X symbolatom 146 396 10 0 0 0 state - - 0;
 #X obj 146 57 route \$1;
 #X obj 146 29 r gesture;
 #X obj 146 83 route id type state duration data;

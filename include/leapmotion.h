@@ -9,7 +9,7 @@
 #include "LeapMotionObj.h"
 #include "Dispatcher.h"
 
-#define PDLEAPMOTION_VERSION "version 0.2.1"
+#define PDLEAPMOTION_VERSION "version 0.2.2"
 
 static t_class* leapmotion_class;
 
@@ -62,7 +62,7 @@ typedef struct _leapmotion
 
 
 // object setup functions
-static void* leapmotion_new (t_symbol* s, int argc, t_atom* argv);
+static void* leapmotion_new (t_symbol* s);
 static void leapmotion_free (t_leapmotion* x);
 extern "C" {void leapmotion_setup (void);}
 // since some pure C libraries are not written with explicit C++ support, the C++ compiler will not be able to find the leapmotion setup function unless we forward declare the function as extern "C"
@@ -93,12 +93,12 @@ static void leapmotionSetHandsPinchStrengthFlag (t_leapmotion* x, t_float state)
 static void leapmotionSetHandsTimeVisibleFlag (t_leapmotion* x, t_float state);
 
 // set methods: fingers
-static void leapmotionSetFingersTypeFlag (t_leapmotion* x, t_float state);
-static void leapmotionSetFingersDirectionFlag (t_leapmotion* x, t_float state);
-static void leapmotionSetFingersPositionFlag (t_leapmotion* x, t_float state);
-static void leapmotionSetFingersVelocityFlag (t_leapmotion* x, t_float state);
-static void leapmotionSetFingersSizeFlag (t_leapmotion* x, t_float state);
-static void leapmotionSetFingersIsExtendedFlag (t_leapmotion* x, t_float state);
+static void leapmotionSetFingerTypeFlag (t_leapmotion* x, t_float state);
+static void leapmotionSetFingerDirectionFlag (t_leapmotion* x, t_float state);
+static void leapmotionSetFingerPositionFlag (t_leapmotion* x, t_float state);
+static void leapmotionSetFingerVelocityFlag (t_leapmotion* x, t_float state);
+static void leapmotionSetFingerSizeFlag (t_leapmotion* x, t_float state);
+static void leapmotionSetFingerIsExtendedFlag (t_leapmotion* x, t_float state);
 
 // set methods: tools
 static void leapmotionSetToolsDirectionFlag (t_leapmotion* x, t_float state);
