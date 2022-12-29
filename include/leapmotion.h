@@ -64,7 +64,7 @@ typedef struct _leapmotion
 
 
 // object setup functions
-static void* leapmotion_new (t_symbol* s);
+static void* leapmotion_new (t_symbol* s, int argc, t_atom* argv);
 static void leapmotion_free (t_leapmotion* x);
 extern "C" {void leapmotion_setup (void);}
 // since some pure C libraries are not written with explicit C++ support, the C++ compiler will not be able to find the leapmotion setup function unless we forward declare the function as extern "C"

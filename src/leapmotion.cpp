@@ -1,7 +1,7 @@
 #include "leapmotion.h"
 
 // constructor
-static void* leapmotion_new (t_symbol* s)
+static void* leapmotion_new (t_symbol* s, int argc, t_atom* argv)
 {
     t_leapmotion* x = (t_leapmotion*) pd_new (leapmotion_class);
 
@@ -79,6 +79,7 @@ void leapmotion_setup (void)
         (t_method) leapmotion_free, // free method
         sizeof (t_leapmotion),
         CLASS_DEFAULT,
+        A_GIMME,
         A_NULL
     );
 
