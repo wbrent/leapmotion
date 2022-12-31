@@ -54,9 +54,9 @@ static void* leapmotion_new (t_symbol* s, int argc, t_atom* argv)
     x->x_generalFlag = 1;
 
     post ("\n****************");
-    post ("[leapmotion] for Pd %s", PDLEAPMOTION_VERSION);
-    post ("Based on version 0.1 by Chikashi Miyama");
-    post ("Updated by William Brent (Dec 2022)");
+    post ("[leapmotion] for Pd %s", PD_LEAPMOTION_VERSION);
+    post ("Forked from version 0.1 by Chikashi Miyama");
+    post ("Updated by William Brent (%s)", PD_LEAPMOTION_RELEASE_DATE);
     post ("****************\n");
 
     return (void*) x;
@@ -757,7 +757,7 @@ static void leapmotionInfo (t_leapmotion* x)
     Leap::DeviceList deviceList = x->x_leapMotionObjPtr->m_controller.devices();
     int numDevices = deviceList.count();
 
-    post ("\n\n******** [leapmotion] %s", PDLEAPMOTION_VERSION);
+    post ("\n\n******** [leapmotion] %s", PD_LEAPMOTION_VERSION);
     post ("****");
     post ("**** Connected devices:");
     for (int d = 0; d < numDevices; d++)
@@ -846,15 +846,15 @@ static void leapmotionPoll (t_leapmotion* x)
     //// output data in right to left order from outlets
     //
     // gestures
-    if (frame.gestures().count())
+    if (frame.gestures().count() > 0)
         leapmotionProcessGestures (x, frame);
 
     // hands and fingers
-    if (frame.hands().count())
+    if (frame.hands().count() > 0)
         leapmotionProcessHands (x, frame);
 
     // tools
-    if (frame.tools().count())
+    if (frame.tools().count() > 0)
         leapmotionProcessTools (x, frame);
 
     // general
