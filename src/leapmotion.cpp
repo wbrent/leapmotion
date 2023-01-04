@@ -887,10 +887,10 @@ static void leapmotionProcessGestures (t_leapmotion* x, Leap::Frame frame)
         Leap::ScreenTapGesture screenTapGesture = gesture;
         Leap::Vector point;
 
-        int numGestureInfoAtoms = 3;
+        const int numGestureInfoAtoms = 3;
         t_atom gestureInfo[numGestureInfoAtoms];
 
-        int numGestureDataAtoms = 7;
+        const int numGestureDataAtoms = 7;
         t_atom gestureData[numGestureDataAtoms];
 
         // id
@@ -1059,7 +1059,7 @@ static void leapmotionProcessHands (t_leapmotion* x, Leap::Frame frame)
     for (int handIdx = 0; handIdx < handList.count(); handIdx++)
     {
         int numFingersPerHand, numToolsPerHand;
-        int numHandInfoAtoms = 6;
+        const int numHandInfoAtoms = 6;
         t_atom handInfo[numHandInfoAtoms];
 
         Leap::Hand hand = handList[handIdx];
@@ -1277,7 +1277,7 @@ static void leapmotionProcessHands (t_leapmotion* x, Leap::Frame frame)
 static void leapmotionProcessArm (t_leapmotion* x, int handIdx, Leap::Hand hand, Leap::InteractionBox interactionBox)
 {
     Leap::Arm arm = hand.arm();
-    int numArmInfoAtoms = 6;
+    const int numArmInfoAtoms = 6;
     t_atom armInfo[numArmInfoAtoms];
     Leap::Vector point;
 
@@ -1366,7 +1366,7 @@ static void leapmotionProcessFingers (t_leapmotion* x, int handIdx, Leap::Finger
     for (int fingerIdx = 0; fingerIdx < fingerList.count(); fingerIdx++)
     {
         Leap::Finger finger = fingerList[fingerIdx];
-        int numFingerInfoAtoms = 7;
+        const int numFingerInfoAtoms = 7;
         t_atom fingerInfo[numFingerInfoAtoms];
         Leap::Vector point;
 
@@ -1482,7 +1482,7 @@ static void leapmotionProcessTools (t_leapmotion* x, Leap::Frame frame)
     // tools per frame
     for (int toolIdx = 0; toolIdx < toolList.count(); toolIdx++)
     {
-        int numToolInfoAtoms = 5;
+        const int numToolInfoAtoms = 5;
         t_atom toolInfo[numToolInfoAtoms];
         Leap::Vector point;
 
@@ -1542,7 +1542,7 @@ static void leapmotionProcessTools (t_leapmotion* x, Leap::Frame frame)
 // process general data
 static void leapmotionProcessGeneral (t_leapmotion* x, Leap::Frame frame)
 {
-    int numGeneralInfoAtoms = 6;
+    const int numGeneralInfoAtoms = 6;
     t_atom generalInfo[numGeneralInfoAtoms];
 
     SETFLOAT (&generalInfo[0], (t_float) frame.id());
