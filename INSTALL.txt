@@ -2,7 +2,7 @@
 
 Thanks to pd-lib-builder, the only requirement for compiling from source is to edit one line of the included Makefile. Set the path to your LeapSDK download on the line specifying leapSDKdir = /your/path/to/the/LeapSDK. Then open a terminal, navigate to the leapmotion directory and invoke "make". The [leapmotion] binary will appear in the leapmotion directory, and can be copied to any desired location. Note that libLeap.so (Linux) or libLeap.dylib (macOS) must be in the sae directory as the [leapmotion] binary.
 
-Under macOS, libLeap.dylib is built for x86 and x86_64 only. There is no arm64 build for M1 machines. Specify your architecture when invoking make via the "arch" option (e.g., make arch='x86_64').
+Under macOS, libLeap.dylib is built for i386 and x86_64 only. There is no arm64 build for M1 machines. Specify your architecture when invoking make via the "arch" option (e.g., make arch='x86_64').
 
 
 
