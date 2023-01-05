@@ -1,0 +1,40 @@
+**** Linux and macOS
+
+Thanks to pd-lib-builder, the only requirement for compiling from source is to edit one line of the included Makefile. Set the path to your LeapSDK download on the line specifying leapSDKdir = /your/path/to/the/LeapSDK. Then open a terminal, navigate to the leapmotion directory and invoke "make". The [leapmotion] binary will appear in the leapmotion directory, and can be copied to any desired location. Note that libLeap.so (Linux) or libLeap.dylib (macOS) must be in the sae directory as the [leapmotion] binary.
+
+Under macOS, libLeap.dylib is built for x86 and x86_64 only. There is no arm64 build for M1 machines. Specify your architecture when invoking make via the "arch" option (e.g., make arch='x86_64').
+
+
+
+
+**** Windows 10 64-bit
+
+Using pd-lib-builder and MSYS2 MinGW 64-bit, compiling will succeed on Windows, but linking will fail. It is necessary to build/link using Cmake and the MSVC++ compiler. The following steps were used to build the leapmotion.dll available via deken.
+
+1) Install Visual Studio 2022
+
+2) Clone or download a snapshot of the pd.build repo: https://github.com/pierreguillot/pd.build and place the pd.build directory in the leapmotion directory.
+
+3) Open leapmotion\CMakeLists.txt and edit it accordingly to refer to the Pd source, LeapDeveloperKit_2.3.1+31549_win/LeapSDK/include, and LeapDeveloperKit_2.3.1+31549_win/LeapSDK/lib/x64 directories. Note that forward slashes must be used for these paths.
+
+4) Open the x64 Native Tools Command Prompt for VS 2022. By default, this is located in C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Visual Studio 2022\Visual Studio Tools\VC.
+
+5) In the command prompt, navigate to the leapmotion directory. Create a build directory with "mkdir build", then navigate into that directory with "cd build". Run "cmake .." to configure the build according to leapmotion\CMakeLists.txt. Running "cmake --fresh .." will overwrite all previous configuration files,  if needed. Then run "cmake --build ." to compile and link. By default, cmake will build in Debug mode. To build in release mode, run "cmake --fresh ..", followed by "cmake --build . --config Release". The resulting leapmotion.dll will appear in leapmotion\build\build. Move this to leapmotion\help in order to open leapmotion-help.pd and use the external.
+
+Notes:
+
+The [leapmotion] external for Windows 10 depends on the following libraries:
+
+    kernel32.dll
+    Leap.dll
+    msvcp140d.dll
+    pd.dll
+    ucrtbased.dll
+    vcruntime140d.dll
+    vcruntime140_1d.dll
+
+Leap.dll is included with this binary package, but can also be obtained from LeapDeveloperKit_2.3.1+31549_win/LeapSDK/lib/x64. The pd.dll dependency will be satisfied by the Pd application itself. Installing Visual Studio 2022 may provide all of the remaining dependencies. If all of these libraries are available (in either the leapmotion\help or C:\Windows\System32 directories) and the external still fails to load with a "leapmotion.dll: The specified module could not be found. (126)" error message in the Pd console, use https://github.com/lucasg/Dependencies to examine the dependency list for leapmotion.dll.
+
+Finally, note that there is an issue with the Leap Motion 2.3.1 installer for Windows 10 available at https://developer.leapmotion.com/releases. When running the installer, a popup warning appears about missing graphics drivers. This can be ignored. When installation is finished, navigate to
+C:\Program Files (x86)\Leap Motion\Core Services\Drivers
+and run dpinst64.exe to install 64-bit drivers for the Leap Motion Controller.

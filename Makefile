@@ -1,11 +1,8 @@
 # Makefile for leapmotion
 
-# specify a location for Pd if desired
-# PDDIR = /home/yourname/somedirectory/pd-0.53-1
-
 lib.name = leapmotion
 
-# this project is built against Leap Developer Kit 2.3.1+31549, and requires the same version of libLeap.so (Linux) libLeap.dylib (macOS), or Leap.dll (Windows)
+# this project is built against Leap Developer Kit 2.3.1+31549, and requires the same version of libLeap.so (Linux), libLeap.dylib (macOS), or Leap.dll (Windows)
 # specify the location of the 2.3.1 LeapSDK directory
 leapSDKdir = /your/path/to/the/LeapSDK
 
@@ -40,7 +37,7 @@ $(lib.name).class.sources = src/$(lib.name).cpp
 
 common.sources = src/Dispatcher.cpp src/LeapMotionObj.cpp
 
-datafiles = help/leapmotion-help.pd README.md LICENSE
+datafiles = help/leapmotion-help.pd README.md LICENSE INSTALL.txt
 
 # provide the path to pd-lib-builder
 PDLIBBUILDER_DIR=./pd-lib-builder/
