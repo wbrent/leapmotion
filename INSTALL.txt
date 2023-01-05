@@ -27,11 +27,11 @@ The [leapmotion] external for Windows 10 depends on the following libraries:
 
     kernel32.dll
     Leap.dll
-    msvcp140d.dll
+    msvcp140.dll
     pd.dll
-    ucrtbased.dll
-    vcruntime140d.dll
-    vcruntime140_1d.dll
+    ucrtbase.dll
+    vcruntime140.dll
+    vcruntime140_1.dll
 
 Leap.dll is included with this binary package, but can also be obtained from LeapDeveloperKit_2.3.1+31549_win/LeapSDK/lib/x64. The pd.dll dependency will be satisfied by the Pd application itself. Installing Visual Studio 2022 may provide all of the remaining dependencies. If all of these libraries are available (in either the leapmotion\help or C:\Windows\System32 directories) and the external still fails to load with a "leapmotion.dll: The specified module could not be found. (126)" error message in the Pd console, use https://github.com/lucasg/Dependencies to examine the dependency list for leapmotion.dll.
 
