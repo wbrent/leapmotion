@@ -1,6 +1,6 @@
 # leapmotion
 
-[leapmotion] is a Pure Data external for accessing Leap Motion Controller data in Pd under Linux and macOS. This repository is a fork of Chikashi Miyama's Pd_leapmotion version 0.1 code.
+[leapmotion] is a Pure Data external for accessing Leap Motion Controller data in Pd under Linux, macOS, and Windows. This repository is a fork of Chikashi Miyama's Pd_leapmotion version 0.1 code.
 
 To keep things simple, all reference to the FLEXT interface for building Pd & Max/MSP externals in C++ has been removed. It can be built against Leap SDK version 2.3.1 for Linux and macOS, which is its only dependency. Version 2.3.1 of the Leap SDK is available in the [legacy releases](https://developer.leapmotion.com/releases) area of their developer resources page. It may be possible to build/link this external under Windows as well, but only using version 2.3.1 of the Leap SDK.
 
