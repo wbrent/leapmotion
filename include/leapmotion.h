@@ -9,8 +9,8 @@
 #include "LeapMotionObj.h"
 #include "Dispatcher.h"
 
-#define PD_LEAPMOTION_VERSION "version 0.2.3"
-#define PD_LEAPMOTION_RELEASE_DATE "Dec 2022"
+#define PD_LEAPMOTION_VERSION "version 0.2.4"
+#define PD_LEAPMOTION_RELEASE_DATE "April 2023"
 
 static t_class* leapmotion_class;
 

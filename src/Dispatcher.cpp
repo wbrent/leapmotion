@@ -8,6 +8,12 @@ void Dispatcher::onInit (const Leap::Controller& controller)
 void Dispatcher::onServiceConnect (const Leap::Controller& controller)
 {
     post ("Leap Motion Service: Connected");
+
+    // we attempted to set the policy POLICY_BACKGROUND_FRAMES in the LeapMotionObj constructor. once we actually connect to LEAP service, we should check that the policy change was successful.
+    if (controller.isPolicySet(Leap::Controller::POLICY_BACKGROUND_FRAMES))
+        post ("Leap Motion POLICY_BACKGROUND_FRAMES set successfully");
+    else
+        post ("\nLeap Motion POLICY_BACKGROUND_FRAMES failed. Is \"Allow Background Apps\" activated in LEAP general settings?\n");
 }
 
 void Dispatcher::onServiceChange (const Leap::Controller& controller)
